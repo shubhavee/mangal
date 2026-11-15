@@ -21,7 +21,6 @@ window.WEDDING = {
   // Main wedding muhurat — drives the countdown. Keep the +05:30 (IST).
   weddingDate: "2027-01-18T18:00:00+05:30",
   displayDate: "17 – 19 January 2027",
-  rsvpBy: "15th December 2026",
 
   venue: {
     name: "Nature Knots",
