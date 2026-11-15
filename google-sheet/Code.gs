@@ -7,7 +7,7 @@
  * Ticket follow-ups: menu 💍 Wedding → Build ticket follow-up links (see README.md).
  */
 
-const RSVP_HEADERS = ["Updated", "Name", "Phone", "Attending", "Side", "Guests", "Days", "From", "Message", "Source", "Device ID", "Ticket received?"];
+const RSVP_HEADERS = ["Updated", "Name", "Phone", "Attending", "Side", "Guests", "Days", "From", "Message", "Source", "Ticket received?"];
 
 function doPost(e) {
   const lock = LockService.getScriptLock();
@@ -30,14 +30,10 @@ function doGet() {
 function saveRsvp(d) {
   const sh = tab("RSVPs", RSVP_HEADERS);
   syncHeaders(sh);
-  const row = [new Date(), d.name, d.phone ? "'" + d.phone : "", d.attending, d.side || "", d.guests || "", d.events || "", d.from || "", d.message || "", d.source || "Website", d.deviceId || ""];
-  // Same guest again = they changed their answer → update their row (keeps "Ticket received?" and any phone added by hand).
-  // Laptop RSVPs are matched on phone number; phone RSVPs (no number in the form) on the device they used.
-  const r = (d.phone && findRow(sh, "Phone", d.phone)) || (d.deviceId && findRow(sh, "Device ID", d.deviceId));
-  if (r) {
-    if (!d.phone) row[2] = sh.getRange(r, 3).getValue();
-    sh.getRange(r, 1, 1, row.length).setValues([row]);
-  }
+  const row = [new Date(), d.name, d.phone ? "'" + d.phone : "", d.attending, d.side || "", d.guests || "", d.events || "", d.from || "", d.message || "", d.source || "Website"];
+  // Same phone number again = guest changed their answer → update their row (keeps "Ticket received?").
+  const r = findRow(sh, d.phone);
+  if (r) sh.getRange(r, 1, 1, row.length).setValues([row]);
   else {
     sh.appendRow(row);
     sh.getRange(sh.getLastRow(), RSVP_HEADERS.length).insertCheckboxes();
@@ -60,8 +56,7 @@ function onOpen() {
 /**
  * Creates/refreshes the "Follow-ups" tab: every Yes guest whose "Ticket received?" box isn't ticked,
  * with a WhatsApp link that opens a chat with them and the message ready to send.
- * The website doesn't ask for phone numbers, so add each guest's number in the RSVPs tab's Phone column
- * (copy it from the WhatsApp chat where their RSVP arrived). Guests without a number are listed with a note.
+ * Guests without a valid number (e.g. typed wrongly) are listed with a note to fix it on the RSVPs tab.
  * Guests reply with their ticket in that same chat; tick "Ticket received?" on the RSVPs tab when it arrives.
  */
 function buildFollowUps() {
@@ -75,7 +70,7 @@ function buildFollowUps() {
     .map((r) => {
       const phone = String(r[col("Phone")]).replace(/\D/g, "").slice(-10);
       const first = String(r[col("Name")]).trim().split(" ")[0];
-      if (phone.length !== 10) return [r[col("Name")], "", r[col("Guests")], "Add phone in RSVPs tab", false];
+      if (phone.length !== 10) return [r[col("Name")], "", r[col("Guests")], "Fix phone in RSVPs tab", false];
       const wa = `https://wa.me/91${phone}?text=${encodeURIComponent(FOLLOW_UP_TEXT(first))}`;
       return [r[col("Name")], "'" + phone, r[col("Guests")], `=HYPERLINK("${wa}","Message ➜")`, false];
     });
@@ -98,11 +93,11 @@ function tab(name, headers) {
   return sh;
 }
 
-function findRow(sh, header, value) {
-  const norm = header === "Phone" ? (v) => String(v).replace(/\D/g, "").slice(-10) : (v) => String(v).trim();
-  const want = norm(value);
-  if (!want) return 0;
-  const vals = sh.getRange(1, RSVP_HEADERS.indexOf(header) + 1, Math.max(sh.getLastRow(), 1), 1).getValues();
+function findRow(sh, phone) {
+  const norm = (v) => String(v).replace(/\D/g, "").slice(-10);
+  const want = norm(phone);
+  if (want.length !== 10) return 0;
+  const vals = sh.getRange(1, RSVP_HEADERS.indexOf("Phone") + 1, Math.max(sh.getLastRow(), 1), 1).getValues();
   for (let i = 1; i < vals.length; i++) if (norm(vals[i][0]) === want) return i + 1;
   return 0;
 }

@@ -172,23 +172,13 @@
   };
 
   /* ---------- RSVP ---------- */
-  // Phones RSVP over WhatsApp (the couple sees the sender's number there). Laptops may not have
-  // WhatsApp, so they give their number in the form instead and the RSVP goes to the Sheet only.
+  // Phones also send the RSVP to the couple on WhatsApp. Laptops may not have WhatsApp,
+  // so there the RSVP goes to the Sheet only.
   const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) ||
     (navigator.maxTouchPoints > 1 && matchMedia("(pointer: coarse)").matches);
-  document.body.classList.toggle("is-mobile", isMobile);
   const rsvpForm = $("#rsvpForm");
   if (!isMobile) $("#rsvpSubmit").textContent = "Send RSVP";
 
-  // Stable per-device ID so a guest who RSVPs again from the same phone updates their row.
-  const deviceId = (() => {
-    const make = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
-    try {
-      let id = localStorage.getItem("rsvpDevice");
-      if (!id) { id = make(); localStorage.setItem("rsvpDevice", id); }
-      return id;
-    } catch { return make(); }
-  })();
 
   rsvpForm.addEventListener("change", (e) => {
     if (e.target.name === "attending") rsvpForm.classList.toggle("attending-yes", e.target.value === "Yes");
@@ -201,16 +191,15 @@
     if (!d.attending) return (status.textContent = "Please choose Yes or No.");
     if (d.side === undefined) return (status.textContent = "Please choose whose side you're from.");
     if (!d.name?.trim()) return (status.textContent = "Please enter your name.");
-    if (isMobile) delete d.phone;
-    else if (digits(d.phone).slice(-10).length !== 10) return (status.textContent = "Please enter your 10-digit WhatsApp number.");
-    else d.phone = digits(d.phone).slice(-10);
+    d.phone = digits(d.phone).slice(-10);
+    if (d.phone.length !== 10) return (status.textContent = "Please enter your 10-digit WhatsApp number.");
     if (d.attending === "No") { delete d.guests; delete d.events; delete d.from; }
 
     const side = W.rsvp.sides[d.side];
     d.side = side.label;
 
     // Private copy in the Google Sheet (fire-and-forget so WhatsApp opens instantly).
-    if (W.rsvp.sheetEndpoint) sendToSheet({ type: "rsvp", ...d, deviceId, source: isMobile ? "Phone (WhatsApp)" : "Laptop (form)" }).catch(() => {});
+    if (W.rsvp.sheetEndpoint) sendToSheet({ type: "rsvp", ...d, source: isMobile ? "Phone (WhatsApp)" : "Laptop (form)" }).catch(() => {});
 
     // The RSVP itself is a personal WhatsApp message to Srishti or Shubham.
     const lines = [
