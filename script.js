@@ -147,8 +147,20 @@
   }
 
   /* ---------- Intro ---------- */
+  // Always start from the top: stop the browser restoring the old scroll position on reload.
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+  const toTop = () => window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+  toTop();
+  window.addEventListener("pageshow", toTop); // also when coming back via the Back button
+  // In-page links scroll without adding #section to the address, so a reload still starts at the top.
+  document.querySelectorAll('a[href^="#"]').forEach((a) => a.addEventListener("click", (e) => {
+    const target = document.querySelector(a.getAttribute("href"));
+    if (target) { e.preventDefault(); target.scrollIntoView({ behavior: "smooth" }); }
+  }));
   document.body.classList.add("locked");
   $("#openInvite").addEventListener("click", () => {
+    toTop();
     $("#intro").classList.add("gone");
     document.body.classList.remove("locked");
     opened = true;
