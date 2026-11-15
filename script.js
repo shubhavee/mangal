@@ -103,10 +103,14 @@
     window.onYouTubeIframeAPIReady = () => {
       yt = new YT.Player("ytPlayer", {
         width: 120, height: 68, videoId: ytId,
-        playerVars: { loop: 1, playlist: ytId, controls: 0, playsinline: 1, modestbranding: 1 },
+        playerVars: { start: W.musicStart || 0, controls: 0, playsinline: 1, modestbranding: 1 },
         events: {
           onReady: () => { yt.setVolume(60); if (opened) yt.playVideo(); },
-          onStateChange: (e) => setPlaying(e.data === 1),
+          onStateChange: (e) => {
+            setPlaying(e.data === 1);
+            // Loop ourselves so every repeat also starts at musicStart.
+            if (e.data === 0) { yt.seekTo(W.musicStart || 0, true); yt.playVideo(); }
+          },
         },
       });
     };

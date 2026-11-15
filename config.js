@@ -57,7 +57,7 @@ window.WEDDING = {
     fallbackNumber: "917738836237",
     // Paste the Google Apps Script Web App URL here (see README.md, step 2)
     // so every RSVP is also saved privately in your Google Sheet.
-    sheetEndpoint: "",
+    sheetEndpoint: "https://script.google.com/macros/s/AKfycbxXevmqaALIbCEW3Xc_FlMqs7lAH4VTy6siavBF8szm3Fv-phLzKGVqVaIFyKl3AzvJDw/exec",
   },
 
   // Points of contact shown on the site
@@ -71,4 +71,5 @@ window.WEDDING = {
   // link/ID in `musicYouTube` (used only when the mp3 is missing). Button hides if neither works.
   music: "assets/music.mp3",
   musicYouTube: "https://www.youtube.com/watch?v=3qpxJEp4Ec4", // Kudmayi (Film Version), Saregama
+  musicStart: 4, // seconds to skip at the start (also used when it loops)
 };
