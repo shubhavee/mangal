@@ -63,7 +63,7 @@ function pendingTravel() {
 /* ---------- Jan 1 travel reminders (sent from your own WhatsApp, one tap each) ---------- */
 
 // Your hosted site URL, e.g. "https://our-wedding.netlify.app/"
-const SITE_URL = "https://shubhikashubhavee.github.io/srishti-weds-shubham/";
+const SITE_URL = "https://shubhavee.github.io/srishti-weds-shubham/";
 const REMINDER_TEXT = (name, link) =>
   `Hi ${name}! 🙏 Hope you're excited for the wedding in Bengaluru 🎉\n\n` +
   `If you've booked your travel, please share your arrival details & ticket here so we can arrange your pickup:\n${link}\n\n` +
