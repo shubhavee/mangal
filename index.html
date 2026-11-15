@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Great+Vibes&family=Marcellus&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=202611151732" />
+  <link rel="stylesheet" href="styles.css?v=202611151739" />
 </head>
 <body>
 
@@ -61,6 +61,19 @@
   </header>
 
   <main>
+    <!-- ===== Poem ===== -->
+    <section class="section poem">
+      <svg class="poem-om" viewBox="0 0 100 100" aria-hidden="true"><use href="#om" /></svg>
+      <p class="poem-hi">
+        सात फेरों का ये पावन बंधन,<br />
+        दो परिवारों का प्यारा संगम।<br />
+        दिल्ली की ख़ुशबू, बिहार का प्यार,<br />
+        सजे बेंगलुरु में ये शुभ त्योहार॥
+      </p>
+      <p class="poem-en">Seven sacred rounds, one pure bond; two families, one loving union.<br />
+        The fragrance of Delhi, the warmth of Bihar: a celebration of joy in Bengaluru.</p>
+    </section>
+
     <!-- ===== Families ===== -->
     <section class="section families">
       <p class="eyebrow">Dilli meets Bihar</p>
@@ -191,95 +204,97 @@
         <circle cx="32" cy="158" r="3" /><circle cx="268" cy="158" r="3" />
       </g>
     </symbol>
-    <!-- Bride: red dupatta, maang tikka, nath, jhumkas — gaze to the right (towards the groom) -->
+    <!-- Bride: red dupatta, long hair, maang tikka, nath, jhumkas — gaze to the right (towards the groom) -->
     <symbol id="bride" viewBox="0 0 200 220">
-      <!-- veil behind -->
-      <path d="M100 18 C48 18 22 62 24 120 C26 170 14 200 8 220 H192 C186 200 174 170 176 120 C178 62 152 18 100 18 Z" fill="#a3123f" />
-      <path d="M100 18 C48 18 22 62 24 120 C26 170 14 200 8 220" fill="none" stroke="#ecd08a" stroke-width="5" stroke-dasharray="0.1 9" stroke-linecap="round" />
-      <path d="M100 18 C152 18 178 62 176 120 C174 170 186 200 192 220" fill="none" stroke="#ecd08a" stroke-width="5" stroke-dasharray="0.1 9" stroke-linecap="round" />
-      <!-- blouse / lehenga top -->
-      <path d="M30 220 C34 182 62 164 100 164 C138 164 166 182 170 220 Z" fill="#c2185b" />
-      <path d="M58 220 C64 196 80 184 100 184 C120 184 136 196 142 220" fill="none" stroke="#e8c873" stroke-width="3" />
-      <!-- neck -->
-      <path d="M86 138 H114 V172 C108 178 92 178 86 172 Z" fill="#d99e78" />
-      <g transform="rotate(5 100 100)">
-        <!-- hair -->
-        <path d="M58 98 C56 52 80 36 100 36 C120 36 144 52 142 98 C142 118 136 132 130 140 H70 C64 132 58 118 58 98 Z" fill="#2b1a14" />
+      <!-- veil, back -->
+      <path d="M100 22 C42 22 24 70 28 124 C31 166 20 198 14 220 H186 C180 198 169 166 172 124 C176 70 158 22 100 22 Z" fill="#a3123f" />
+      <!-- long hair falling behind the shoulders -->
+      <path d="M54 104 C48 150 46 190 42 220 H158 C154 190 152 150 146 104 Z" fill="#24140f" />
+      <!-- blouse -->
+      <path d="M40 220 C44 190 68 172 100 172 C132 172 156 190 160 220 Z" fill="#c2185b" />
+      <path d="M66 220 C72 200 84 190 100 190 C116 190 128 200 134 220" fill="none" stroke="#e8c873" stroke-width="3" />
+      <!-- neck & choker -->
+      <path d="M88 140 H112 V176 C106 181 94 181 88 176 Z" fill="#e0a982" />
+      <path d="M86 168 C93 178 107 178 114 168" fill="none" stroke="#e0b44c" stroke-width="5" stroke-linecap="round" />
+      <g fill="#c2185b"><circle cx="100" cy="176" r="3.2" /><circle cx="92" cy="173" r="1.8" /><circle cx="108" cy="173" r="1.8" /></g>
+      <!-- front locks of hair down to the waist -->
+      <path d="M58 112 C52 140 60 170 54 220 H70 C74 184 66 150 70 120 Z" fill="#2b1a14" />
+      <path d="M142 112 C148 140 140 170 146 220 H130 C126 184 134 150 130 120 Z" fill="#2b1a14" />
+      <g transform="rotate(6 100 110)">
         <!-- face -->
-        <ellipse cx="100" cy="100" rx="35" ry="41" fill="#ebb791" />
-        <!-- hair parting & fringe -->
-        <path d="M100 58 C88 58 70 66 66 90 C72 74 86 66 100 64 C114 66 128 74 134 90 C130 66 112 58 100 58 Z" fill="#2b1a14" />
+        <ellipse cx="100" cy="102" rx="43" ry="45" fill="#f0c19c" />
+        <!-- hair framing the face, centre parting -->
+        <path d="M56 104 C52 60 76 46 100 46 C124 46 148 60 144 104 C140 82 124 66 102 64 L100 70 L98 64 C76 66 60 82 56 104 Z" fill="#2b1a14" />
         <!-- maang tikka -->
-        <path d="M100 40 V66" stroke="#e0b44c" stroke-width="2" />
-        <circle cx="100" cy="70" r="5" fill="#e0b44c" /><circle cx="100" cy="70" r="2.2" fill="#c2185b" />
+        <path d="M100 48 V72" stroke="#e0b44c" stroke-width="2" />
+        <circle cx="100" cy="76" r="5" fill="#e0b44c" /><circle cx="100" cy="76" r="2.3" fill="#c2185b" />
+        <circle cx="100" cy="87" r="2.6" fill="#b5174f" />
         <!-- brows -->
-        <path d="M76 86 C82 82 90 82 94 85" fill="none" stroke="#3a2418" stroke-width="2.4" stroke-linecap="round" />
-        <path d="M108 85 C112 82 120 82 126 86" fill="none" stroke="#3a2418" stroke-width="2.4" stroke-linecap="round" />
-        <!-- eyes looking right -->
-        <ellipse cx="86" cy="97" rx="7" ry="5.2" fill="#fff" /><ellipse cx="116" cy="97" rx="7" ry="5.2" fill="#fff" />
-        <circle cx="89" cy="97.5" r="3.6" fill="#2b1a14" /><circle cx="119" cy="97.5" r="3.6" fill="#2b1a14" />
-        <circle cx="90.2" cy="96.2" r="1.1" fill="#fff" /><circle cx="120.2" cy="96.2" r="1.1" fill="#fff" />
-        <path d="M78 94 C82 90 92 90 94 94 M108 94 C112 90 122 90 124 94" fill="none" stroke="#2b1a14" stroke-width="2" stroke-linecap="round" />
-        <!-- bindi -->
-        <circle cx="100" cy="84" r="2.6" fill="#b5174f" />
-        <!-- nose & nath -->
-        <path d="M101 102 C103 108 102 111 98 112" fill="none" stroke="#c48563" stroke-width="1.8" stroke-linecap="round" />
-        <circle cx="104.5" cy="113" r="3.8" fill="none" stroke="#e0b44c" stroke-width="1.5" /><circle cx="107" cy="116" r="1.2" fill="#c2185b" />
-        <path d="M108 111 C120 106 128 104 133 104" fill="none" stroke="#e0b44c" stroke-width=".9" stroke-dasharray="1.5 1.5" />
-        <!-- cheeks & smile -->
-        <ellipse cx="78" cy="113" rx="7" ry="4" fill="#f08a8a" opacity=".45" /><ellipse cx="124" cy="113" rx="7" ry="4" fill="#f08a8a" opacity=".45" />
-        <path d="M90 122 C96 128 106 128 112 122 C106 124 96 124 90 122 Z" fill="#b5174f" stroke="#b5174f" stroke-width="1.5" stroke-linejoin="round" />
+        <path d="M74 91 C79 88 86 88 90 90" fill="none" stroke="#3a2418" stroke-width="2.2" stroke-linecap="round" />
+        <path d="M110 90 C114 88 121 88 126 91" fill="none" stroke="#3a2418" stroke-width="2.2" stroke-linecap="round" />
+        <!-- big sparkly eyes looking right -->
+        <circle cx="82" cy="106" r="9.5" fill="#fff" /><circle cx="118" cy="106" r="9.5" fill="#fff" />
+        <circle cx="85" cy="107" r="7" fill="#3b2418" /><circle cx="121" cy="107" r="7" fill="#3b2418" />
+        <circle cx="87.5" cy="104" r="2.6" fill="#fff" /><circle cx="123.5" cy="104" r="2.6" fill="#fff" />
+        <circle cx="83" cy="110" r="1.2" fill="#fff" /><circle cx="119" cy="110" r="1.2" fill="#fff" />
+        <path d="M72 101 C76 95 88 94 92 99 M108 99 C112 94 124 95 128 101" fill="none" stroke="#24140f" stroke-width="2.4" stroke-linecap="round" />
+        <path d="M73 100 L69 97 M127 100 L131 97 M128 103 L132 101" stroke="#24140f" stroke-width="1.6" stroke-linecap="round" />
+        <!-- tiny nose & nath -->
+        <path d="M99 116 C101 118 103 118 104 116" fill="none" stroke="#c98560" stroke-width="1.8" stroke-linecap="round" />
+        <circle cx="105.5" cy="119" r="3.3" fill="none" stroke="#e0b44c" stroke-width="1.4" /><circle cx="107.5" cy="121.5" r="1.1" fill="#c2185b" />
+        <path d="M108.5 117 C122 112 132 110 138 110" fill="none" stroke="#e0b44c" stroke-width=".9" stroke-dasharray="1.5 1.5" />
+        <!-- rosy cheeks & smile -->
+        <ellipse cx="72" cy="122" rx="8" ry="5" fill="#ff8a9a" opacity=".55" /><ellipse cx="128" cy="122" rx="8" ry="5" fill="#ff8a9a" opacity=".55" />
+        <path d="M91 127 C95 134 105 134 109 127 Z" fill="#c2185b" stroke="#c2185b" stroke-width="2" stroke-linejoin="round" />
         <!-- jhumkas -->
-        <g fill="#e0b44c"><circle cx="65" cy="112" r="3" /><path d="M59 118 H71 L68 126 H62 Z" /><circle cx="135" cy="112" r="3" /><path d="M129 118 H141 L138 126 H132 Z" /></g>
+        <g fill="#e0b44c"><circle cx="57" cy="116" r="3" /><path d="M51 121 H63 L60 130 H54 Z" /><circle cx="143" cy="116" r="3" /><path d="M137 121 H149 L146 130 H140 Z" /></g>
       </g>
-      <!-- choker -->
-      <path d="M84 166 C92 176 108 176 116 166" fill="none" stroke="#e0b44c" stroke-width="5" stroke-linecap="round" />
-      <g fill="#c2185b"><circle cx="100" cy="174" r="3" /><circle cx="91" cy="171" r="1.8" /><circle cx="109" cy="171" r="1.8" /></g>
-      <!-- veil front edge over shoulder -->
-      <path d="M42 160 C58 150 70 160 74 176 C78 196 70 210 66 220 H30 C34 196 36 174 42 160 Z" fill="#a3123f" />
-      <path d="M42 160 C58 150 70 160 74 176 C78 196 70 210 66 220" fill="none" stroke="#ecd08a" stroke-width="4" stroke-dasharray="0.1 8" stroke-linecap="round" />
+      <!-- veil border -->
+      <path d="M100 22 C42 22 24 70 28 124 C31 166 20 198 14 220 M100 22 C158 22 176 70 172 124 C169 166 180 198 186 220" fill="none" stroke="#ecd08a" stroke-width="5" stroke-dasharray="0.1 9" stroke-linecap="round" />
     </symbol>
     <!-- Groom: saffron safa with kalgi, ivory sherwani, clean-shaven — gaze to the left (towards the bride) -->
     <symbol id="groom" viewBox="0 0 200 220">
       <!-- sherwani -->
-      <path d="M26 220 C30 180 60 162 100 162 C140 162 170 180 174 220 Z" fill="#f6e7c4" />
-      <path d="M100 166 V220" stroke="#c9a24a" stroke-width="2" />
-      <g fill="#c9a24a"><circle cx="100" cy="184" r="2.6" /><circle cx="100" cy="198" r="2.6" /><circle cx="100" cy="212" r="2.6" /></g>
-      <path d="M84 162 L100 176 L116 162" fill="none" stroke="#c9a24a" stroke-width="3" stroke-linejoin="round" />
-      <!-- maroon stole over right shoulder -->
-      <path d="M128 166 C150 170 166 186 172 220 H146 C142 198 134 182 120 172 Z" fill="#7a1729" />
-      <path d="M128 166 C150 170 166 186 172 220" fill="none" stroke="#e8c873" stroke-width="2.5" />
+      <path d="M36 220 C40 188 66 170 100 170 C134 170 160 188 164 220 Z" fill="#f6e7c4" />
+      <path d="M100 174 V220" stroke="#c9a24a" stroke-width="2" />
+      <g fill="#c9a24a"><circle cx="100" cy="190" r="2.6" /><circle cx="100" cy="203" r="2.6" /><circle cx="100" cy="216" r="2.6" /></g>
+      <path d="M86 170 L100 182 L114 170" fill="none" stroke="#c9a24a" stroke-width="3" stroke-linejoin="round" />
+      <!-- maroon stole over the shoulder -->
+      <path d="M126 172 C146 176 160 192 164 220 H142 C138 200 130 186 118 178 Z" fill="#7a1729" />
+      <path d="M126 172 C146 176 160 192 164 220" fill="none" stroke="#e8c873" stroke-width="2.5" />
       <!-- pearl mala -->
-      <path d="M80 168 C84 196 116 196 120 168" fill="none" stroke="#fffaf1" stroke-width="4" stroke-dasharray="0.1 6" stroke-linecap="round" />
-      <path d="M76 168 C80 206 120 206 124 168" fill="none" stroke="#fffaf1" stroke-width="4" stroke-dasharray="0.1 6" stroke-linecap="round" />
+      <path d="M82 174 C86 200 114 200 118 174" fill="none" stroke="#fffaf1" stroke-width="4" stroke-dasharray="0.1 6" stroke-linecap="round" />
       <!-- neck -->
-      <path d="M86 136 H114 V166 C108 172 92 172 86 166 Z" fill="#cf946d" />
-      <g transform="rotate(-5 100 100)">
-        <!-- ears & short hair at sides -->
-        <ellipse cx="64" cy="104" rx="6" ry="9" fill="#d99e78" /><ellipse cx="136" cy="104" rx="6" ry="9" fill="#d99e78" />
-        <path d="M64 92 C64 80 70 74 76 72 L76 98 Z M136 92 C136 80 130 74 124 72 L124 98 Z" fill="#241510" />
+      <path d="M88 140 H112 V172 C106 177 94 177 88 172 Z" fill="#d89c74" />
+      <g transform="rotate(-6 100 110)">
+        <!-- ears & short hair -->
+        <ellipse cx="57" cy="108" rx="7" ry="10" fill="#e2a982" /><ellipse cx="143" cy="108" rx="7" ry="10" fill="#e2a982" />
         <!-- face -->
-        <ellipse cx="100" cy="102" rx="35" ry="40" fill="#e2a982" />
+        <ellipse cx="100" cy="104" rx="43" ry="44" fill="#e9b48c" />
+        <path d="M58 98 C58 90 60 84 64 82 L66 104 C62 103 59 101 58 98 Z M142 98 C142 90 140 84 136 82 L134 104 C138 103 141 101 142 98 Z" fill="#241510" />
         <!-- safa -->
-        <path d="M56 80 C52 44 76 22 104 22 C134 22 152 44 146 80 C130 70 116 68 100 68 C84 68 70 70 56 80 Z" fill="#e8a53a" />
-        <path d="M56 80 C70 70 84 68 100 68 C116 68 130 70 146 80" fill="none" stroke="#c97f1c" stroke-width="4" />
-        <path d="M60 62 C80 50 120 46 144 60 M66 46 C86 34 116 32 136 42" fill="none" stroke="#c97f1c" stroke-width="3" stroke-linecap="round" />
-        <path d="M58 72 C78 60 122 58 146 70" fill="none" stroke="#f6c86a" stroke-width="2" />
-        <!-- kalgi (turban brooch & plume) -->
-        <path d="M100 52 C96 36 102 18 112 10 C110 24 108 38 104 52 Z" fill="#fffaf1" stroke="#e8c873" stroke-width="1.2" />
-        <circle cx="100" cy="56" r="7" fill="#e0b44c" /><circle cx="100" cy="56" r="3.4" fill="#2f6b3a" />
-        <path d="M94 62 C92 70 96 74 100 74 C104 74 108 70 106 62" fill="none" stroke="#fffaf1" stroke-width="2.4" stroke-dasharray="0.1 4" stroke-linecap="round" />
+        <path d="M52 84 C46 44 74 18 104 18 C136 18 156 44 148 84 C132 72 118 70 100 70 C82 70 66 72 52 84 Z" fill="#eda93c" />
+        <path d="M52 84 C66 72 82 70 100 70 C118 70 132 72 148 84" fill="none" stroke="#c97f1c" stroke-width="4" stroke-linecap="round" />
+        <path d="M56 64 C78 52 122 48 148 62 M64 46 C86 34 118 32 138 42" fill="none" stroke="#c97f1c" stroke-width="3" stroke-linecap="round" />
+        <path d="M54 74 C76 62 124 60 148 72" fill="none" stroke="#fbd27a" stroke-width="2" />
+        <!-- kalgi -->
+        <path d="M100 54 C95 38 101 18 112 8 C110 24 108 40 104 54 Z" fill="#fffaf1" stroke="#e8c873" stroke-width="1.2" />
+        <circle cx="100" cy="58" r="7" fill="#e0b44c" /><circle cx="100" cy="58" r="3.4" fill="#2f6b3a" />
+        <path d="M94 64 C92 72 96 76 100 76 C104 76 108 72 106 64" fill="none" stroke="#fffaf1" stroke-width="2.4" stroke-dasharray="0.1 4" stroke-linecap="round" />
         <!-- brows -->
-        <path d="M74 88 C80 84 89 84 94 87" fill="none" stroke="#241510" stroke-width="3.4" stroke-linecap="round" />
-        <path d="M106 87 C111 84 120 84 126 88" fill="none" stroke="#241510" stroke-width="3.4" stroke-linecap="round" />
-        <!-- eyes looking left -->
-        <ellipse cx="85" cy="99" rx="6.6" ry="5" fill="#fff" /><ellipse cx="115" cy="99" rx="6.6" ry="5" fill="#fff" />
-        <circle cx="82" cy="99.5" r="3.5" fill="#241510" /><circle cx="112" cy="99.5" r="3.5" fill="#241510" />
-        <circle cx="83" cy="98.2" r="1.1" fill="#fff" /><circle cx="113" cy="98.2" r="1.1" fill="#fff" />
-        <!-- nose & smile (clean-shaven) -->
-        <path d="M99 104 C97 110 98 113 102 114" fill="none" stroke="#b97a56" stroke-width="1.8" stroke-linecap="round" />
-        <path d="M88 124 C95 131 107 131 113 124" fill="none" stroke="#8c3b2e" stroke-width="2.6" stroke-linecap="round" />
-        <ellipse cx="76" cy="115" rx="6" ry="3.5" fill="#f08a8a" opacity=".3" /><ellipse cx="124" cy="115" rx="6" ry="3.5" fill="#f08a8a" opacity=".3" />
+        <path d="M72 93 C77 89 86 89 90 92" fill="none" stroke="#241510" stroke-width="3.2" stroke-linecap="round" />
+        <path d="M110 92 C114 89 123 89 128 93" fill="none" stroke="#241510" stroke-width="3.2" stroke-linecap="round" />
+        <!-- big sparkly eyes looking left -->
+        <circle cx="82" cy="108" r="9" fill="#fff" /><circle cx="118" cy="108" r="9" fill="#fff" />
+        <circle cx="79" cy="109" r="6.6" fill="#2b1a14" /><circle cx="115" cy="109" r="6.6" fill="#2b1a14" />
+        <circle cx="81" cy="106" r="2.4" fill="#fff" /><circle cx="117" cy="106" r="2.4" fill="#fff" />
+        <circle cx="77" cy="112" r="1.1" fill="#fff" /><circle cx="113" cy="112" r="1.1" fill="#fff" />
+        <path d="M73 103 C77 98 87 98 91 102 M109 102 C113 98 123 98 127 103" fill="none" stroke="#24140f" stroke-width="2" stroke-linecap="round" />
+        <!-- tiny nose, cheeks & happy smile (clean-shaven) -->
+        <path d="M96 118 C98 120 100 120 102 118" fill="none" stroke="#bf7d58" stroke-width="1.8" stroke-linecap="round" />
+        <ellipse cx="71" cy="124" rx="8" ry="5" fill="#ff8a9a" opacity=".4" /><ellipse cx="129" cy="124" rx="8" ry="5" fill="#ff8a9a" opacity=".4" />
+        <path d="M88 128 C93 137 107 137 112 128 Z" fill="#8c2f39" stroke="#8c2f39" stroke-width="2" stroke-linejoin="round" />
+        <path d="M93 129.5 H107" stroke="#fff" stroke-width="2.2" stroke-linecap="round" />
       </g>
     </symbol>
     <symbol id="om" viewBox="0 0 100 100">
@@ -289,7 +304,7 @@
     </symbol>
   </svg>
 
-  <script src="config.js?v=202611151732"></script>
-  <script src="script.js?v=202611151732"></script>
+  <script src="config.js?v=202611151739"></script>
+  <script src="script.js?v=202611151739"></script>
 </body>
 </html>
