@@ -172,7 +172,23 @@
   };
 
   /* ---------- RSVP ---------- */
+  // Phones RSVP over WhatsApp (the couple sees the sender's number there). Laptops may not have
+  // WhatsApp, so they give their number in the form instead and the RSVP goes to the Sheet only.
+  const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) ||
+    (navigator.maxTouchPoints > 1 && matchMedia("(pointer: coarse)").matches);
+  document.body.classList.toggle("is-mobile", isMobile);
   const rsvpForm = $("#rsvpForm");
+  if (!isMobile) $("#rsvpSubmit").textContent = "Send RSVP";
+
+  // Stable per-device ID so a guest who RSVPs again from the same phone updates their row.
+  const deviceId = (() => {
+    const make = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
+    try {
+      let id = localStorage.getItem("rsvpDevice");
+      if (!id) { id = make(); localStorage.setItem("rsvpDevice", id); }
+      return id;
+    } catch { return make(); }
+  })();
 
   rsvpForm.addEventListener("change", (e) => {
     if (e.target.name === "attending") rsvpForm.classList.toggle("attending-yes", e.target.value === "Yes");
@@ -185,13 +201,16 @@
     if (!d.attending) return (status.textContent = "Please choose Yes or No.");
     if (d.side === undefined) return (status.textContent = "Please choose whose side you're from.");
     if (!d.name?.trim()) return (status.textContent = "Please enter your name.");
+    if (isMobile) delete d.phone;
+    else if (digits(d.phone).slice(-10).length !== 10) return (status.textContent = "Please enter your 10-digit WhatsApp number.");
+    else d.phone = digits(d.phone).slice(-10);
     if (d.attending === "No") { delete d.guests; delete d.events; delete d.from; }
 
     const side = W.rsvp.sides[d.side];
     d.side = side.label;
 
     // Private copy in the Google Sheet (fire-and-forget so WhatsApp opens instantly).
-    if (W.rsvp.sheetEndpoint) sendToSheet({ type: "rsvp", ...d }).catch(() => {});
+    if (W.rsvp.sheetEndpoint) sendToSheet({ type: "rsvp", ...d, deviceId, source: isMobile ? "Phone (WhatsApp)" : "Laptop (form)" }).catch(() => {});
 
     // The RSVP itself is a personal WhatsApp message to Srishti or Shubham.
     const lines = [
@@ -201,7 +220,7 @@
     if (d.attending === "Yes") lines.push(`Guests: ${d.guests}`, `Days: ${d.events || "-"}`, `Travelling from: ${d.from || "-"}`);
     if (d.message) lines.push("", d.message);
     const link = waLink(sideNumber(side), lines.join("\n"));
-    window.open(link, "_blank");
+    if (isMobile) window.open(link, "_blank");
     showDone(d, side, link);
   });
 
@@ -210,18 +229,19 @@
     const done = $("#rsvpDone"); done.hidden = false;
     const actions = $("#doneActions"); actions.innerHTML = "";
     const first = esc(d.name.trim().split(" ")[0]);
-    // In case the browser blocked the pop-up, or they closed WhatsApp without sending.
-    actions.append(linkBtn(`Send my RSVP to ${side.name} on WhatsApp`, link, "btn-wa"));
+    // Phone: in case the pop-up was blocked or they closed WhatsApp without sending. Laptop: optional.
+    actions.append(linkBtn(isMobile ? `Send my RSVP to ${side.name} on WhatsApp` : `Also say hi to ${side.name} on WhatsApp`, link, isMobile ? "btn-wa" : "btn-outline"));
+    const sendNote = isMobile ? " Just hit <b>Send</b> in WhatsApp." : " We've received your RSVP.";
 
     if (d.attending === "No") {
       $("#doneTitle").textContent = "We'll miss you 🙏";
-      $("#doneText").innerHTML = `Thank you for letting us know, ${first}. Just hit <b>Send</b> in WhatsApp. Your blessings mean the world to us.`;
+      $("#doneText").innerHTML = `Thank you for letting us know, ${first}.${sendNote} Your blessings mean the world to us.`;
       done.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
 
     $("#doneTitle").textContent = "Yay! See you in Bengaluru 🎉";
-    $("#doneText").innerHTML = `Thank you, ${first}! Just hit <b>Send</b> in WhatsApp to confirm. Our wedding planner will get in touch closer to the date about your travel and pickup.`;
+    $("#doneText").innerHTML = `Thank you, ${first}!${sendNote} Our wedding planner will get in touch closer to the date about your travel and pickup.`;
     if (!reduced) burst(60);
 
     done.scrollIntoView({ behavior: "smooth", block: "center" });

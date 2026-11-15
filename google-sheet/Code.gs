@@ -7,7 +7,7 @@
  * Ticket follow-ups: menu 💍 Wedding → Build ticket follow-up links (see README.md).
  */
 
-const RSVP_HEADERS = ["Updated", "Name", "Phone", "Attending", "Side", "Guests", "Days", "From", "Message", "Source", "Ticket received?"];
+const RSVP_HEADERS = ["Updated", "Name", "Phone", "Attending", "Side", "Guests", "Days", "From", "Message", "Source", "Device ID", "Ticket received?"];
 
 function doPost(e) {
   const lock = LockService.getScriptLock();
@@ -29,9 +29,11 @@ function doGet() {
 
 function saveRsvp(d) {
   const sh = tab("RSVPs", RSVP_HEADERS);
-  const row = [new Date(), d.name, d.phone ? "'" + d.phone : "", d.attending, d.side || "", d.guests || "", d.events || "", d.from || "", d.message || "", d.source || "Website"];
+  syncHeaders(sh);
+  const row = [new Date(), d.name, d.phone ? "'" + d.phone : "", d.attending, d.side || "", d.guests || "", d.events || "", d.from || "", d.message || "", d.source || "Website", d.deviceId || ""];
   // Same guest again = they changed their answer → update their row (keeps "Ticket received?" and any phone added by hand).
-  const r = findRow(sh, d.name);
+  // Laptop RSVPs are matched on phone number; phone RSVPs (no number in the form) on the device they used.
+  const r = (d.phone && findRow(sh, "Phone", d.phone)) || (d.deviceId && findRow(sh, "Device ID", d.deviceId));
   if (r) {
     if (!d.phone) row[2] = sh.getRange(r, 3).getValue();
     sh.getRange(r, 1, 1, row.length).setValues([row]);
@@ -96,12 +98,21 @@ function tab(name, headers) {
   return sh;
 }
 
-function findRow(sh, name) {
-  const norm = (v) => String(v).trim().toLowerCase().replace(/\s+/g, " ");
-  const want = norm(name);
-  const names = sh.getRange(1, 2, Math.max(sh.getLastRow(), 1), 1).getValues();
-  for (let i = 1; i < names.length; i++) if (norm(names[i][0]) === want) return i + 1;
+function findRow(sh, header, value) {
+  const norm = header === "Phone" ? (v) => String(v).replace(/\D/g, "").slice(-10) : (v) => String(v).trim();
+  const want = norm(value);
+  if (!want) return 0;
+  const vals = sh.getRange(1, RSVP_HEADERS.indexOf(header) + 1, Math.max(sh.getLastRow(), 1), 1).getValues();
+  for (let i = 1; i < vals.length; i++) if (norm(vals[i][0]) === want) return i + 1;
   return 0;
+}
+
+// Keeps the header row in step with RSVP_HEADERS if columns were added after the tab was created.
+function syncHeaders(sh) {
+  const cur = sh.getRange(1, 1, 1, RSVP_HEADERS.length).getValues()[0];
+  if (cur.join("|") !== RSVP_HEADERS.join("|")) {
+    sh.getRange(1, 1, 1, RSVP_HEADERS.length).setValues([RSVP_HEADERS]).setFontWeight("bold").setBackground("#f6e7c4");
+  }
 }
 
 function json(obj) {
