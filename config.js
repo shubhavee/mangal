@@ -7,13 +7,15 @@ window.WEDDING = {
     name: "Srishti",
     fullName: "Srishti Jain",
     city: "New Delhi",
-    parents: "Daughter of Mr. Kamlesh Kumar Jain & Mrs. Shashi Jain",
+    relation: "Daughter of",
+    parents: ["Mrs. Shashi Jain", "Mr. Kamlesh Kumar Jain"],
   },
   groom: {
     name: "Shubham",
     fullName: "Shubham Shamanyu",
     city: "Bihar",
-    parents: "Son of Mr. Surendra Prasad & Mrs. Sangeeta Prasad",
+    relation: "Son of",
+    parents: ["Mrs. Sangeeta Prasad", "Mr. Surendra Prasad"],
   },
 
   hashtag: "#SriShubhVivah",

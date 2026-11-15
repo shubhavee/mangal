@@ -9,6 +9,11 @@
   /* ---------- Fill in text from config ---------- */
   document.querySelectorAll("[data-bind]").forEach((el) => { el.textContent = get(el.dataset.bind) ?? ""; });
   document.title = `${W.bride.name} & ${W.groom.name} · Wedding Invitation`;
+  // "Daughter of / Mrs. … / & / Mr. …", one name per line.
+  document.querySelectorAll("[data-parents]").forEach((el) => {
+    const p = W[el.dataset.parents];
+    el.innerHTML = `<span class="rel">${esc(p.relation)}</span>` + p.parents.map((n) => `<span>${esc(n)}</span>`).join('<span class="amp">&amp;</span>');
+  });
   $("#mapFrame").src = W.venue.mapsEmbed;
   $("#mapsLink").href = W.venue.mapsLink;
 
