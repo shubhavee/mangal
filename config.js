@@ -35,7 +35,7 @@ window.WEDDING = {
   // Day-by-day programme, in order of time. Replace "[Time]" and "[Dress code]" once fixed.
   days: [
     {
-      label: "Day One", date: "Sunday, 17 January 2027", short: "Sun, 17 Jan",
+      label: "Day One", date: "Sunday, 17 January 2027", short: "Sun, 17 Jan", key: "17 Jan",
       events: [
         { name: "Puja", hindi: "पूजा", period: "Morning", time: "[Time]", dress: "[Dress code]" },
         { name: "Haldi", hindi: "हल्दी", period: "Afternoon", time: "[Time]", dress: "Shades of yellow" },
@@ -43,7 +43,7 @@ window.WEDDING = {
       ],
     },
     {
-      label: "Day Two", date: "Monday, 18 January 2027", short: "Mon, 18 Jan",
+      label: "Day Two", date: "Monday, 18 January 2027", short: "Mon, 18 Jan", key: "18 Jan",
       events: [
         { name: "Puja", hindi: "पूजा", period: "Morning", time: "[Time]", dress: "[Dress code]" },
         { name: "Baraat", hindi: "बारात", period: "Afternoon", time: "[Time]", dress: "Traditional" },
@@ -52,7 +52,7 @@ window.WEDDING = {
       ],
     },
     {
-      label: "Day Three", date: "Tuesday, 19 January 2027", short: "Tue, 19 Jan",
+      label: "Day Three", date: "Tuesday, 19 January 2027", short: "Tue, 19 Jan", key: "19 Jan",
       events: [
         { name: "Vidaai", hindi: "विदाई", period: "Morning", time: "[Time]", dress: "[Dress code]" },
       ],

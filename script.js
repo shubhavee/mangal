@@ -32,7 +32,7 @@
     </article>`).join("");
 
   $("#eventChecks").innerHTML = W.days.map((day) =>
-    `<label title="${esc(day.events.map((e) => e.name).join(", "))}"><input type="checkbox" name="events" value="${esc(day.short)}" checked /> ${esc(day.short)}</label>`).join("");
+    `<label title="${esc(day.events.map((e) => e.name).join(", "))}"><input type="checkbox" name="days" value="${esc(day.key)}" checked /> ${esc(day.short)}</label>`).join("");
 
   $("#sideChoice").innerHTML = W.rsvp.sides.map((s, i) =>
     `<label class="choice-btn side"><input type="radio" name="side" value="${i}" required /><span>${esc(s.label)}</span></label>`).join("");
@@ -206,7 +206,9 @@
     if (!d.name?.trim()) return (status.textContent = "Please enter your name.");
     d.phone = digits(d.phone).slice(-10);
     if (d.phone.length !== 10) return (status.textContent = "Please enter your 10-digit WhatsApp number.");
-    if (d.attending === "No") { delete d.guests; delete d.events; delete d.from; }
+    // One true/false per day, so the Sheet can show a tick box for each (17, 18, 19 Jan).
+    d.days = d.attending === "Yes" ? [...rsvpForm.querySelectorAll('input[name="days"]:checked')].map((c) => c.value) : [];
+    if (d.attending === "No") { delete d.guests; delete d.from; }
     d.name = d.name.trim();
     d.side = W.rsvp.sides[d.side].label;
 

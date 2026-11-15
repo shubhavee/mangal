@@ -7,7 +7,9 @@
  * Ticket follow-ups: menu 💍 Wedding → Build ticket follow-up links (see README.md).
  */
 
-const RSVP_HEADERS = ["Updated", "Name", "Phone", "Attending", "Side", "Guests", "Days", "From", "Message", "Source", "Ticket received?"];
+// One tick-box column per wedding day; must match the "key" of each day in the website's config.js.
+const DAY_KEYS = ["17 Jan", "18 Jan", "19 Jan"];
+const RSVP_HEADERS = ["Updated", "Name", "Phone", "Attending", "Side", "Guests", ...DAY_KEYS, "From", "Message", "Source", "Ticket received?"];
 
 function doPost(e) {
   const lock = LockService.getScriptLock();
@@ -30,14 +32,15 @@ function doGet() {
 function saveRsvp(d) {
   const sh = tab("RSVPs", RSVP_HEADERS);
   syncHeaders(sh);
-  const row = [new Date(), d.name, d.phone ? "'" + d.phone : "", d.attending, d.side || "", d.guests || "", d.events || "", d.from || "", d.message || "", d.source || "Website"];
+  const row = [new Date(), d.name, d.phone ? "'" + d.phone : "", d.attending, d.side || "", d.guests || "", ...DAY_KEYS.map((k) => (d.days || []).includes(k)), d.from || "", d.message || "", d.source || "Website"];
   // Same phone number again = guest changed their answer → update their row (keeps "Ticket received?").
   const r = findRow(sh, d.phone);
-  if (r) sh.getRange(r, 1, 1, row.length).setValues([row]);
-  else {
-    sh.appendRow(row);
-    sh.getRange(sh.getLastRow(), RSVP_HEADERS.length).insertCheckboxes();
-  }
+  const rowNum = r || sh.getLastRow() + 1;
+  sh.getRange(rowNum, 1, 1, row.length).setValues([row]);
+  // Show the day columns as tick boxes without changing their true/false values.
+  const tick = SpreadsheetApp.newDataValidation().requireCheckbox().build();
+  sh.getRange(rowNum, RSVP_HEADERS.indexOf(DAY_KEYS[0]) + 1, 1, DAY_KEYS.length).setDataValidation(tick);
+  if (!r) sh.getRange(rowNum, RSVP_HEADERS.length).insertCheckboxes();
 }
 
 /* ---------- Ticket follow-ups (sent from Divya's WhatsApp, one tap each) ---------- */
