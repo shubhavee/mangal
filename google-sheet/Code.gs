@@ -90,8 +90,7 @@ function tab(name, headers) {
   let sh = ss.getSheetByName(name);
   if (!sh) {
     sh = ss.insertSheet(name);
-    sh.appendRow(headers);
-    sh.getRange(1, 1, 1, headers.length).setFontWeight("bold").setBackground("#f6e7c4");
+    sh.getRange(1, 1, 1, headers.length).setNumberFormat("@").setValues([headers]).setFontWeight("bold").setBackground("#f6e7c4");
     sh.setFrozenRows(1);
   }
   return sh;
@@ -108,9 +107,13 @@ function findRow(sh, phone) {
 
 // Keeps the header row in step with RSVP_HEADERS if columns were added after the tab was created.
 function syncHeaders(sh) {
-  const cur = sh.getRange(1, 1, 1, RSVP_HEADERS.length).getValues()[0];
+  const cur = sh.getRange(1, 1, 1, RSVP_HEADERS.length).getDisplayValues()[0];
   if (cur.join("|") !== RSVP_HEADERS.join("|")) {
-    sh.getRange(1, 1, 1, RSVP_HEADERS.length).setValues([RSVP_HEADERS]).setFontWeight("bold").setBackground("#f6e7c4");
+    // "@" = plain text, so headers like "17 Jan" aren't turned into dates.
+    sh.getRange(1, 1, 1, RSVP_HEADERS.length).setNumberFormat("@").setValues([RSVP_HEADERS])
+      .setFontWeight("bold").setBackground("#f6e7c4").setHorizontalAlignment("left");
+    const extra = sh.getLastColumn() - RSVP_HEADERS.length; // leftover headers from an older layout
+    if (extra > 0) sh.getRange(1, RSVP_HEADERS.length + 1, 1, extra).clearContent().setBackground(null);
   }
 }
 
