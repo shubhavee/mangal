@@ -12,8 +12,8 @@ window.WEDDING = {
   groom: {
     name: "Shubham",
     fullName: "Shubham Shamanyu",
-    city: "[City], Bihar",
-    parents: "Son of Mr. Surendra Prasad & Mrs. [Mother's Name]",
+    city: "Bihar",
+    parents: "Son of Mr. Surendra Prasad & Mrs. Sangeeta Prasad",
   },
 
   hashtag: "#SriShubhVivah",
