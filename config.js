@@ -71,5 +71,5 @@ window.WEDDING = {
   // link/ID in `musicYouTube` (used only when the mp3 is missing). Button hides if neither works.
   music: "assets/music.mp3",
   musicYouTube: "https://www.youtube.com/watch?v=3qpxJEp4Ec4", // Kudmayi (Film Version), Saregama
-  musicStart: 4, // seconds to skip at the start (also used when it loops)
+  musicStart: 6, // seconds to skip at the start (also used when it loops)
 };

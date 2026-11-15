@@ -32,10 +32,11 @@
 
   <div id="petals" aria-hidden="true"></div>
 
-  <button id="musicBtn" class="music-btn" aria-label="Play or pause music" hidden>
-    <span class="bars"><i></i><i></i><i></i><i></i></span>
+  <button id="musicBtn" class="music-btn" aria-pressed="true" hidden>
+    <span class="bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    <span class="music-label">Music On</span>
   </button>
-  <audio id="bgm" loop preload="none"></audio>
+  <audio id="bgm" preload="none"></audio>
 
   <!-- ===== Hero ===== -->
   <header class="hero">

@@ -97,10 +97,13 @@ small { color: var(--muted); font-size: .8em; }
 
 /* ---------- Music button ---------- */
 .music-btn {
-  position: fixed; right: 16px; bottom: 16px; z-index: 50; width: 52px; height: 52px; border-radius: 50%;
-  border: 1.5px solid var(--gold); background: var(--maroon); cursor: pointer; display: grid; place-items: center;
-  box-shadow: 0 6px 18px rgba(0,0,0,.25);
+  position: fixed; right: 16px; bottom: 16px; z-index: 50; height: 46px; padding: 0 18px 0 16px; border-radius: 999px;
+  border: 1.5px solid var(--gold); background: var(--maroon); cursor: pointer; display: flex; align-items: center; gap: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.25); color: var(--gold-light);
+  font-family: var(--display); font-size: .75rem; letter-spacing: .12em; text-transform: uppercase;
 }
+.music-btn[aria-pressed="false"] { background: var(--paper); color: var(--maroon); }
+.music-btn[aria-pressed="false"] .bars i { background: var(--maroon); opacity: .45; }
 .bars { display: flex; gap: 3px; align-items: flex-end; height: 18px; }
 .bars i { width: 3px; height: 6px; background: var(--gold-light); border-radius: 2px; }
 .music-btn.playing .bars i { animation: eq 1s ease-in-out infinite; }
@@ -109,8 +112,7 @@ small { color: var(--muted); font-size: .8em; }
 .music-btn.playing .bars i:nth-child(4) { animation-delay: .1s; }
 @keyframes eq { 50% { height: 18px; } }
 
-.yt-box { position: fixed; right: 76px; bottom: 16px; z-index: 50; width: 120px; height: 68px; border-radius: 10px; overflow: hidden; border: 1.5px solid var(--gold); opacity: .9; }
-.yt-box iframe { display: block; }
+.yt-box { position: fixed; left: 0; bottom: 0; width: 2px; height: 2px; overflow: hidden; opacity: 0; pointer-events: none; z-index: -1; }
 
 /* ---------- Hero ---------- */
 .hero {

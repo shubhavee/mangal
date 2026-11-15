@@ -75,7 +75,18 @@
 
   /* ---------- Music (starts on "Open Invitation" tap; browsers block autoplay) ---------- */
   const audio = $("#bgm"), musicBtn = $("#musicBtn");
+  const start = W.musicStart || 0;
   const setPlaying = (on) => musicBtn.classList.toggle("playing", on);
+  // Guest's on/off choice, remembered for their next visit.
+  let musicOn = true;
+  try { musicOn = localStorage.getItem("music") !== "off"; } catch {}
+  function setMusicOn(on) {
+    musicOn = on;
+    try { localStorage.setItem("music", on ? "on" : "off"); } catch {}
+    musicBtn.setAttribute("aria-pressed", on);
+    $(".music-label", musicBtn).textContent = on ? "Music On" : "Music Off";
+    on ? player.play() : player.pause();
+  }
   const ytId = (W.musicYouTube || "").match(/(?:v=|youtu\.be\/|embed\/|shorts\/)?([\w-]{11})(?:[?&#]|$)/)?.[1];
   let yt = null, useYt = false, opened = false;
   const player = {
@@ -87,14 +98,16 @@
   audio.src = W.music;
   audio.addEventListener("play", () => setPlaying(true));
   audio.addEventListener("pause", () => setPlaying(false));
+  audio.addEventListener("loadedmetadata", () => { if (audio.currentTime < start) audio.currentTime = start; });
+  audio.addEventListener("ended", () => { audio.currentTime = start; audio.play().catch(() => {}); });
   audio.addEventListener("error", () => {
     if (!ytId) return (musicBtn.hidden = true);
     useYt = true; loadYouTube();
   });
   audio.load();
-  musicBtn.addEventListener("click", () => (player.paused() ? player.play() : player.pause()));
+  musicBtn.addEventListener("click", () => setMusicOn(!musicOn));
 
-  // YouTube fallback: a tiny player in the corner (YouTube needs it on screen to play).
+  // YouTube fallback: the player is kept invisible so only the audio comes through.
   function loadYouTube() {
     const box = document.createElement("div");
     box.id = "ytBox"; box.className = "yt-box";
@@ -103,13 +116,13 @@
     window.onYouTubeIframeAPIReady = () => {
       yt = new YT.Player("ytPlayer", {
         width: 120, height: 68, videoId: ytId,
-        playerVars: { start: W.musicStart || 0, controls: 0, playsinline: 1, modestbranding: 1 },
+        playerVars: { start, controls: 0, playsinline: 1, modestbranding: 1 },
         events: {
-          onReady: () => { yt.setVolume(60); if (opened) yt.playVideo(); },
+          onReady: () => { yt.setVolume(60); if (opened && musicOn) yt.playVideo(); },
           onStateChange: (e) => {
             setPlaying(e.data === 1);
             // Loop ourselves so every repeat also starts at musicStart.
-            if (e.data === 0) { yt.seekTo(W.musicStart || 0, true); yt.playVideo(); }
+            if (e.data === 0) { yt.seekTo(start, true); yt.playVideo(); }
           },
         },
       });
@@ -127,7 +140,7 @@
     opened = true;
     musicBtn.hidden = false;
     audio.volume = 0.6;
-    player.play();
+    setMusicOn(musicOn);
     if (!reduced) { burst(40); setInterval(dropPetal, 900); }
   });
 
