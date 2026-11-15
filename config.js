@@ -53,23 +53,18 @@ window.WEDDING = {
       { label: "Srishti's side", name: "Srishti", whatsapp: "[91XXXXXXXXXX]" },
       { label: "Shubham's side", name: "Shubham", whatsapp: "[91XXXXXXXXXX]" },
     ],
-    // Used if a side's number above isn't filled in yet, and for travel details.
+    // Used if a side's number above isn't filled in yet.
     fallbackNumber: "917738836237",
     // Paste the Google Apps Script Web App URL here (see README.md, step 2)
     // so every RSVP is also saved privately in your Google Sheet.
     sheetEndpoint: "",
   },
 
-  travel: {
-    // Guests get a calendar reminder for this date to share tickets.
-    reminderDate: "2027-01-01",
-  },
-
   // Points of contact shown on the site
   contacts: [
     { role: "Bride's side", name: "[Name]", phone: "+91 [XXXXX XXXXX]" },
     { role: "Groom's side", name: "[Name]", phone: "+91 [XXXXX XXXXX]" },
-    { role: "Travel & Stay", name: "Shubhika", phone: "+91 77388 36237" },
+    { role: "Wedding Planner · Travel & Stay", name: "Divya", phone: "+91 [XXXXX XXXXX]" },
   ],
 
   // Background music. Either drop an mp3 at `music` (preferred), OR paste a YouTube

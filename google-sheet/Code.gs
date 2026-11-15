@@ -1,16 +1,13 @@
 /**
- * Wedding RSVP + Travel → Google Sheet
+ * Wedding RSVPs → Google Sheet
  * Paste into: Google Sheet → Extensions → Apps Script. Then Deploy → New deployment → Web app
  * (Execute as: Me, Who has access: Anyone). Copy the URL into config.js → rsvp.sheetEndpoint.
  *
- * Tabs are created automatically: "RSVPs" and "Travel". Tickets are saved to a Drive folder.
- * File → Download → Microsoft Excel (.xlsx) any time.
+ * The "RSVPs" tab is created automatically. File → Download → Microsoft Excel (.xlsx) any time.
+ * Ticket follow-ups: menu 💍 Wedding → Build ticket follow-up links (see README.md).
  */
 
-const TICKETS_FOLDER = "Wedding Travel Tickets";
-
-const RSVP_HEADERS = ["Updated", "Name", "Phone", "Attending", "Side", "Guests", "Days", "From", "Message", "Source", "Travel shared?"];
-const TRAVEL_HEADERS = ["Submitted", "Name", "Phone", "Ticket link"];
+const RSVP_HEADERS = ["Updated", "Name", "Phone", "Attending", "Side", "Guests", "Days", "From", "Message", "Source", "Ticket received?"];
 
 function doPost(e) {
   const lock = LockService.getScriptLock();
@@ -18,7 +15,6 @@ function doPost(e) {
   try {
     const d = JSON.parse(e.postData.contents);
     if (d.type === "rsvp") saveRsvp(d);
-    else if (d.type === "travel") saveTravel(d);
     return json({ ok: true });
   } catch (err) {
     return json({ ok: false, error: String(err) });
@@ -34,68 +30,52 @@ function doGet() {
 function saveRsvp(d) {
   const sh = tab("RSVPs", RSVP_HEADERS);
   const row = [new Date(), d.name, "'" + d.phone, d.attending, d.side || "", d.guests || "", d.events || "", d.from || "", d.message || "", d.source || "Website"];
-  // Same phone number again = guest changed their answer → update their row.
+  // Same phone number again = guest changed their answer → update their row (keeps "Ticket received?").
   const r = findRow(sh, d.phone);
   if (r) sh.getRange(r, 1, 1, row.length).setValues([row]);
-  else sh.appendRow(row.concat(["No"]));
-}
-
-function saveTravel(d) {
-  let link = d.fileUrl || "";
-  if (d.fileData) {
-    const blob = Utilities.newBlob(Utilities.base64Decode(d.fileData), d.fileType || "application/octet-stream", `${d.name} - ${d.phone} - ${d.fileName || "ticket"}`);
-    link = folder().createFile(blob).getUrl();
+  else {
+    sh.appendRow(row);
+    sh.getRange(sh.getLastRow(), RSVP_HEADERS.length).insertCheckboxes();
   }
-  tab("Travel", TRAVEL_HEADERS).appendRow([new Date(), d.name, d.phone ? "'" + d.phone : "", link]);
-  const rs = tab("RSVPs", RSVP_HEADERS);
-  const r = d.phone ? findRow(rs, d.phone) : findRowByName(rs, d.name);
-  if (r) rs.getRange(r, RSVP_HEADERS.indexOf("Travel shared?") + 1).setValue("Yes");
 }
 
-/** Guests who said Yes but haven't shared travel yet. */
-function pendingTravel() {
-  const sh = tab("RSVPs", RSVP_HEADERS);
-  return sh.getDataRange().getValues().slice(1)
-    .filter((r) => r[RSVP_HEADERS.indexOf("Attending")] === "Yes" && r[RSVP_HEADERS.indexOf("Travel shared?")] !== "Yes")
-    .map((r) => ({ name: r[1], phone: String(r[2]).replace(/\D/g, "") }));
-}
+/* ---------- Ticket follow-ups (sent from Divya's WhatsApp, one tap each) ---------- */
 
-/* ---------- Jan 1 travel reminders (sent from your own WhatsApp, one tap each) ---------- */
-
-// Your hosted site URL, e.g. "https://our-wedding.netlify.app/"
-const SITE_URL = "https://shubhavee.github.io/srishti-weds-shubham/";
-const REMINDER_TEXT = (name, link) =>
-  `Hi ${name}! 🙏 Hope you're excited for the wedding in Bengaluru 🎉\n\n` +
-  `If you've booked your travel, please share your arrival details & ticket here so we can arrange your pickup:\n${link}\n\n` +
-  `Takes 1 minute. Thank you! ❤️`;
+const FOLLOW_UP_TEXT = (name) =>
+  `Hi ${name}! 🙏 This is Divya, the wedding planner for Srishti & Shubham's wedding in Bengaluru (17–19 Jan) 🎉\n\n` +
+  `To arrange your airport/station pickup, could you please reply here with your travel ticket (PDF or screenshot)?\n\n` +
+  `Thank you! ❤️`;
 
 function onOpen() {
   SpreadsheetApp.getUi().createMenu("💍 Wedding")
-    .addItem("Build travel reminder links", "buildReminderLinks")
+    .addItem("Build ticket follow-up links", "buildFollowUps")
     .addToUi();
 }
 
 /**
- * Creates/refreshes the "Reminders" tab: every Yes guest who hasn't shared travel yet,
- * with a WhatsApp link that opens a chat with them and a personalised message ready to send.
- * On 1 Jan, open this tab on your phone and tap each link, then Send.
+ * Creates/refreshes the "Follow-ups" tab: every Yes guest whose "Ticket received?" box isn't ticked,
+ * with a WhatsApp link that opens a chat with them and the message ready to send.
+ * Guests reply with their ticket in that same chat; tick "Ticket received?" on the RSVPs tab when it arrives.
  */
-function buildReminderLinks() {
+function buildFollowUps() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const old = ss.getSheetByName("Reminders");
+  const old = ss.getSheetByName("Follow-ups");
   if (old) ss.deleteSheet(old);
-  const sh = tab("Reminders", ["Name", "Phone", "Tap to send on WhatsApp", "Sent? (tick)"]);
-  const rows = pendingTravel().map((g) => {
-    const first = String(g.name).trim().split(" ")[0];
-    const personal = `${SITE_URL}?name=${encodeURIComponent(g.name)}&phone=${g.phone.slice(-10)}#travel`;
-    const wa = `https://wa.me/91${g.phone.slice(-10)}?text=${encodeURIComponent(REMINDER_TEXT(first, personal))}`;
-    return [g.name, "'" + g.phone, `=HYPERLINK("${wa}","Send reminder ➜")`, false];
-  });
+  const sh = tab("Follow-ups", ["Name", "Phone", "Guests", "Tap to message on WhatsApp", "Sent? (tick)"]);
+  const col = (h) => RSVP_HEADERS.indexOf(h);
+  const rows = tab("RSVPs", RSVP_HEADERS).getDataRange().getValues().slice(1)
+    .filter((r) => r[col("Attending")] === "Yes" && r[col("Ticket received?")] !== true)
+    .map((r) => {
+      const phone = String(r[col("Phone")]).replace(/\D/g, "").slice(-10);
+      const first = String(r[col("Name")]).trim().split(" ")[0];
+      const wa = `https://wa.me/91${phone}?text=${encodeURIComponent(FOLLOW_UP_TEXT(first))}`;
+      return [r[col("Name")], "'" + phone, r[col("Guests")], `=HYPERLINK("${wa}","Message ➜")`, false];
+    });
   if (rows.length) {
-    sh.getRange(2, 1, rows.length, 4).setValues(rows);
-    sh.getRange(2, 4, rows.length, 1).insertCheckboxes();
+    sh.getRange(2, 1, rows.length, 5).setValues(rows);
+    sh.getRange(2, 5, rows.length, 1).insertCheckboxes();
   }
-  SpreadsheetApp.getUi().alert(`${rows.length} guests still need to share travel details.`);
+  SpreadsheetApp.getUi().alert(`${rows.length} guests still need to send their tickets.`);
 }
 
 function tab(name, headers) {
@@ -117,18 +97,6 @@ function findRow(sh, phone) {
     if (String(phones[i][0]).replace(/\D/g, "").slice(-10) === want) return i + 1;
   }
   return 0;
-}
-
-function findRowByName(sh, name) {
-  const want = String(name).trim().toLowerCase();
-  const names = sh.getRange(1, 2, Math.max(sh.getLastRow(), 1), 1).getValues();
-  for (let i = 1; i < names.length; i++) if (String(names[i][0]).trim().toLowerCase() === want) return i + 1;
-  return 0;
-}
-
-function folder() {
-  const it = DriveApp.getFoldersByName(TICKETS_FOLDER);
-  return it.hasNext() ? it.next() : DriveApp.createFolder(TICKETS_FOLDER);
 }
 
 function json(obj) {

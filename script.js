@@ -126,8 +126,6 @@
     player.play();
     if (!reduced) { burst(40); setInterval(dropPetal, 900); }
   });
-  // Deep links (e.g. the travel reminder) skip the envelope.
-  if (location.hash === "#travel") $("#openInvite").click();
 
   /* ---------- Sending to Google Sheet ---------- */
   async function sendToSheet(payload) {
@@ -195,14 +193,9 @@
     }
 
     $("#doneTitle").textContent = "Yay! See you in Bengaluru 🎉";
-    $("#doneText").innerHTML = `Thank you, ${first}! Just hit <b>Send</b> in WhatsApp to confirm. Once you've booked your tickets, please share your travel details so we can arrange pickups. Set a reminder below so you don't forget.`;
+    $("#doneText").innerHTML = `Thank you, ${first}! Just hit <b>Send</b> in WhatsApp to confirm. Our wedding planner will get in touch closer to the date about your travel and pickup.`;
     if (!reduced) burst(60);
 
-    actions.append(linkBtn("Remind me on Google Calendar", googleCalLink(d), "btn-outline"));
-    const ics = linkBtn("Remind me (iPhone / Outlook)", "#", "btn-outline");
-    ics.addEventListener("click", (ev) => { ev.preventDefault(); downloadIcs(d); });
-    actions.append(ics);
-    actions.append(linkBtn("Already booked? Share tickets now", travelUrl(d), "btn-gold", false));
     done.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
@@ -213,79 +206,5 @@
     return a;
   }
 
-  /* ---------- Travel reminder (on the guest's own calendar) ---------- */
-  function travelUrl(d) {
-    const u = new URL(location.href.split("#")[0].split("?")[0]);
-    u.searchParams.set("name", d.name); u.searchParams.set("phone", phone10(d.phone));
-    return u + "#travel";
-  }
-  const reminder = (d) => {
-    const ymd = W.travel.reminderDate.replace(/-/g, "");
-    return {
-      title: `Share travel tickets for ${W.bride.name} & ${W.groom.name}'s wedding`,
-      details: `Please share your travel details so we can arrange pickups: ${travelUrl(d)}`,
-      start: `${ymd}T043000Z`, end: `${ymd}T050000Z`, // 10:00–10:30 AM IST
-    };
-  };
-  function googleCalLink(d) {
-    const r = reminder(d);
-    return "https://calendar.google.com/calendar/render?action=TEMPLATE" +
-      `&text=${encodeURIComponent(r.title)}&dates=${r.start}/${r.end}&details=${encodeURIComponent(r.details)}`;
-  }
-  function downloadIcs(d) {
-    const r = reminder(d);
-    const ics = [
-      "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Wedding//Invite//EN", "BEGIN:VEVENT",
-      `UID:${Date.now()}@wedding-invite`, `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, "").split(".")[0]}Z`,
-      `DTSTART:${r.start}`, `DTEND:${r.end}`, `SUMMARY:${r.title}`, `DESCRIPTION:${r.details}`,
-      "BEGIN:VALARM", "TRIGGER:-PT0M", "ACTION:DISPLAY", "DESCRIPTION:Share your travel tickets", "END:VALARM",
-      "END:VEVENT", "END:VCALENDAR",
-    ].join("\r\n");
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([ics], { type: "text/calendar" }));
-    a.download = "share-travel-tickets.ics"; a.click();
-  }
 
-  /* ---------- Travel form ---------- */
-  const travelForm = $("#travelForm");
-  const params = new URLSearchParams(location.search);
-  if (params.get("name")) travelForm.name.value = params.get("name");
-  const travelPhone = phone10(params.get("phone")); // from the personal reminder link, if any
-
-  const toBase64 = (file) => new Promise((res, rej) => {
-    const r = new FileReader();
-    r.onload = () => res(String(r.result).split(",")[1]);
-    r.onerror = rej; r.readAsDataURL(file);
-  });
-
-  travelForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const status = $("#travelStatus");
-    const name = travelForm.name.value.trim();
-    const file = travelForm.ticket.files[0];
-    if (!name) return (status.textContent = "Please enter your name.");
-    if (!file) return (status.textContent = "Please choose your ticket file.");
-    if (file.size > 5 * 1024 * 1024) return (status.textContent = "That file is over 5 MB. Please upload a smaller file or a screenshot.");
-
-    const btn = $("button[type=submit]", travelForm);
-    btn.disabled = true; status.textContent = "Uploading…";
-
-    if (W.rsvp.sheetEndpoint) {
-      try {
-        await sendToSheet({ type: "travel", name, phone: travelPhone, fileName: file.name, fileType: file.type, fileData: await toBase64(file) });
-        status.textContent = "Thank you! We've got your ticket ✈️";
-        travelForm.reset();
-      } catch { status.textContent = "Couldn't upload. Please try again."; }
-    } else {
-      // No sheet yet → hand the file to WhatsApp via the phone's share menu, or fall back to a chat.
-      const text = `${name}'s travel ticket for ${W.bride.name} & ${W.groom.name}'s wedding`;
-      if (navigator.canShare?.({ files: [file] })) {
-        try { await navigator.share({ files: [file], text }); status.textContent = "Thank you! ✈️"; } catch { status.textContent = ""; }
-      } else {
-        window.open(waLink(W.rsvp.fallbackNumber, text), "_blank");
-        status.textContent = "Opening WhatsApp. Please attach your ticket in the chat.";
-      }
-    }
-    btn.disabled = false;
-  });
 })();
