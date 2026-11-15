@@ -11,7 +11,7 @@ window.WEDDING = {
   },
   groom: {
     name: "Shubham",
-    fullName: "Shubham [Surname]",
+    fullName: "Shubham Shamanyu",
     city: "[City], Bihar",
     parents: "Son of Mr. Surendra Prasad & Mrs. [Mother's Name]",
   },
