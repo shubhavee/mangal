@@ -29,10 +29,13 @@ function doGet() {
 
 function saveRsvp(d) {
   const sh = tab("RSVPs", RSVP_HEADERS);
-  const row = [new Date(), d.name, "'" + d.phone, d.attending, d.side || "", d.guests || "", d.events || "", d.from || "", d.message || "", d.source || "Website"];
-  // Same phone number again = guest changed their answer → update their row (keeps "Ticket received?").
-  const r = findRow(sh, d.phone);
-  if (r) sh.getRange(r, 1, 1, row.length).setValues([row]);
+  const row = [new Date(), d.name, d.phone ? "'" + d.phone : "", d.attending, d.side || "", d.guests || "", d.events || "", d.from || "", d.message || "", d.source || "Website"];
+  // Same guest again = they changed their answer → update their row (keeps "Ticket received?" and any phone added by hand).
+  const r = findRow(sh, d.name);
+  if (r) {
+    if (!d.phone) row[2] = sh.getRange(r, 3).getValue();
+    sh.getRange(r, 1, 1, row.length).setValues([row]);
+  }
   else {
     sh.appendRow(row);
     sh.getRange(sh.getLastRow(), RSVP_HEADERS.length).insertCheckboxes();
@@ -55,6 +58,8 @@ function onOpen() {
 /**
  * Creates/refreshes the "Follow-ups" tab: every Yes guest whose "Ticket received?" box isn't ticked,
  * with a WhatsApp link that opens a chat with them and the message ready to send.
+ * The website doesn't ask for phone numbers, so add each guest's number in the RSVPs tab's Phone column
+ * (copy it from the WhatsApp chat where their RSVP arrived). Guests without a number are listed with a note.
  * Guests reply with their ticket in that same chat; tick "Ticket received?" on the RSVPs tab when it arrives.
  */
 function buildFollowUps() {
@@ -68,6 +73,7 @@ function buildFollowUps() {
     .map((r) => {
       const phone = String(r[col("Phone")]).replace(/\D/g, "").slice(-10);
       const first = String(r[col("Name")]).trim().split(" ")[0];
+      if (phone.length !== 10) return [r[col("Name")], "", r[col("Guests")], "Add phone in RSVPs tab", false];
       const wa = `https://wa.me/91${phone}?text=${encodeURIComponent(FOLLOW_UP_TEXT(first))}`;
       return [r[col("Name")], "'" + phone, r[col("Guests")], `=HYPERLINK("${wa}","Message ➜")`, false];
     });
@@ -90,12 +96,11 @@ function tab(name, headers) {
   return sh;
 }
 
-function findRow(sh, phone) {
-  const want = String(phone).replace(/\D/g, "").slice(-10);
-  const phones = sh.getRange(1, 3, Math.max(sh.getLastRow(), 1), 1).getValues();
-  for (let i = 1; i < phones.length; i++) {
-    if (String(phones[i][0]).replace(/\D/g, "").slice(-10) === want) return i + 1;
-  }
+function findRow(sh, name) {
+  const norm = (v) => String(v).trim().toLowerCase().replace(/\s+/g, " ");
+  const want = norm(name);
+  const names = sh.getRange(1, 2, Math.max(sh.getLastRow(), 1), 1).getValues();
+  for (let i = 1; i < names.length; i++) if (norm(names[i][0]) === want) return i + 1;
   return 0;
 }
 

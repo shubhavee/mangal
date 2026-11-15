@@ -3,7 +3,6 @@
   const $ = (s, el = document) => el.querySelector(s);
   const get = (path) => path.split(".").reduce((o, k) => (o ? o[k] : undefined), W);
   const digits = (s) => String(s || "").replace(/\D/g, "");
-  const phone10 = (s) => digits(s).slice(-10);
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const waLink = (number, text) => `https://wa.me/${digits(number)}?text=${encodeURIComponent(text)}`;
 
@@ -13,38 +12,51 @@
   $("#mapFrame").src = W.venue.mapsEmbed;
   $("#mapsLink").href = W.venue.mapsLink;
 
-  $("#eventList").innerHTML = W.events.map((e) => `
-    <article class="event">
-      <p class="hindi">${esc(e.hindi)}</p>
-      <h3>${esc(e.name)}</h3>
-      <p class="meta">${esc(e.date)}${e.time ? ` · ${esc(e.time)}` : ""}</p>
-      ${e.place ? `<p class="loc">${esc(e.place)}</p>` : ""}
-      ${e.note ? `<p class="note">${esc(e.note)}</p>` : ""}
-      ${e.dress ? `<span class="dress">Dress code: ${esc(e.dress)}</span>` : ""}
+  $("#eventList").innerHTML = W.days.map((day) => `
+    <article class="day">
+      <header class="day-head">
+        <p class="day-label">${esc(day.label)}</p>
+        <h3>${esc(day.date)}</h3>
+      </header>
+      <ol class="timeline">
+        ${day.events.map((e) => `
+        <li>
+          <div class="t-when"><span class="t-period">${esc(e.period)}</span><span class="t-time">${esc(e.time)}</span></div>
+          <div class="t-what">
+            <p class="hindi">${esc(e.hindi)}</p>
+            <h4>${esc(e.name)}</h4>
+            ${e.dress ? `<p class="dress"><span>Dress code</span> ${esc(e.dress)}</p>` : ""}
+          </div>
+        </li>`).join("")}
+      </ol>
     </article>`).join("");
 
-  const days = [...new Set(W.events.map((e) => e.date))];
-  $("#eventChecks").innerHTML = days.map((day) => {
-    const names = W.events.filter((e) => e.date === day).map((e) => e.name).join(", ");
-    return `<label title="${esc(names)}"><input type="checkbox" name="events" value="${esc(day)}" checked /> ${esc(day)}</label>`;
-  }).join("");
+  $("#eventChecks").innerHTML = W.days.map((day) =>
+    `<label title="${esc(day.events.map((e) => e.name).join(", "))}"><input type="checkbox" name="events" value="${esc(day.short)}" checked /> ${esc(day.short)}</label>`).join("");
 
   $("#sideChoice").innerHTML = W.rsvp.sides.map((s, i) =>
     `<label class="choice-btn side"><input type="radio" name="side" value="${i}" required /><span>${esc(s.label)}</span></label>`).join("");
   const sideNumber = (side) => (digits(side.whatsapp).length >= 10 ? side.whatsapp : W.rsvp.fallbackNumber);
 
-  $("#contactList").innerHTML = W.contacts.map((c) => `
-    <div class="contact">
-      <p class="role">${esc(c.role)}</p>
-      <h3>${esc(c.name)}</h3>
-      <a href="tel:${esc(digits(c.phone))}">${esc(c.phone)}</a>
+  $("#contactList").innerHTML = W.contacts.map((g) => `
+    <div class="contact-group">
+      <p class="role">${esc(g.side)}</p>
+      ${g.people.map((c) => `
+      <div class="contact">
+        <h3>${esc(c.name)}</h3>
+        <p class="relation">${esc(c.relation)}</p>
+        <p class="contact-links">
+          <a href="tel:+${esc(digits(c.phone))}">📞 ${esc(c.phone)}</a>
+          ${digits(c.phone).length >= 10 ? `<a href="https://wa.me/${esc(digits(c.phone))}" target="_blank" rel="noopener">WhatsApp</a>` : ""}
+        </p>
+      </div>`).join("")}
     </div>`).join("");
 
   /* ---------- Scroll reveal ---------- */
   const io = new IntersectionObserver((entries) => entries.forEach((en) => {
     if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); }
   }), { threshold: 0.15 });
-  document.querySelectorAll(".event").forEach((el) => io.observe(el));
+  document.querySelectorAll(".day, .family-card").forEach((el) => io.observe(el));
 
   /* ---------- Countdown ---------- */
   const target = new Date(W.weddingDate).getTime();
@@ -173,19 +185,18 @@
     if (!d.attending) return (status.textContent = "Please choose Yes or No.");
     if (d.side === undefined) return (status.textContent = "Please choose whose side you're from.");
     if (!d.name?.trim()) return (status.textContent = "Please enter your name.");
-    if (phone10(d.phone).length !== 10) return (status.textContent = "Please enter a valid 10-digit mobile number.");
     if (d.attending === "No") { delete d.guests; delete d.events; delete d.from; }
 
     const side = W.rsvp.sides[d.side];
     d.side = side.label;
 
     // Private copy in the Google Sheet (fire-and-forget so WhatsApp opens instantly).
-    if (W.rsvp.sheetEndpoint) sendToSheet({ type: "rsvp", ...d, phone: phone10(d.phone) }).catch(() => {});
+    if (W.rsvp.sheetEndpoint) sendToSheet({ type: "rsvp", ...d }).catch(() => {});
 
     // The RSVP itself is a personal WhatsApp message to Srishti or Shubham.
     const lines = [
       d.attending === "Yes" ? `Hi ${side.name}! 🎉 Yes, I'll be there for your wedding!` : `Hi ${side.name}! 🙏 Sorry, I won't be able to make it to the wedding.`,
-      "", `Name: ${d.name.trim()}`, `Phone: ${d.phone}`,
+      "", `Name: ${d.name.trim()}`,
     ];
     if (d.attending === "Yes") lines.push(`Guests: ${d.guests}`, `Days: ${d.events || "-"}`, `Travelling from: ${d.from || "-"}`);
     if (d.message) lines.push("", d.message);

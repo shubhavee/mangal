@@ -42,7 +42,7 @@
   <header class="hero">
     <div class="toran" aria-hidden="true"></div>
     <div class="arch">
-      <p class="invocation">॥ शुभ विवाह ॥</p>
+      <p class="invocation">॥ श्री शुभ विवाह ॥</p>
       <p class="eyebrow">The wedding of</p>
       <h1 class="names">
         <span data-bind="bride.name"></span>
@@ -68,16 +68,24 @@
       <h2>Two families, one celebration</h2>
       <div class="divider" aria-hidden="true"></div>
       <div class="family-grid">
-        <article class="family-card phulkari">
-          <p class="from">From <span data-bind="bride.city"></span></p>
-          <h3 data-bind="bride.fullName"></h3>
-          <p class="parents" data-bind="bride.parents"></p>
+        <article class="family-card">
+          <svg class="frame" viewBox="0 0 300 420" preserveAspectRatio="none" aria-hidden="true"><use href="#jharokha" /></svg>
+          <div class="family-inner">
+            <svg class="motif" viewBox="0 0 100 100" aria-hidden="true"><use href="#phulkari" /></svg>
+            <p class="from">The Bride · <span data-bind="bride.city"></span></p>
+            <h3 data-bind="bride.fullName"></h3>
+            <p class="parents" data-bind="bride.parents"></p>
+          </div>
         </article>
-        <div class="heart" aria-hidden="true">❤</div>
-        <article class="family-card madhubani">
-          <p class="from">From <span data-bind="groom.city"></span></p>
-          <h3 data-bind="groom.fullName"></h3>
-          <p class="parents" data-bind="groom.parents"></p>
+        <div class="weds" aria-hidden="true"><span>weds</span></div>
+        <article class="family-card">
+          <svg class="frame" viewBox="0 0 300 420" preserveAspectRatio="none" aria-hidden="true"><use href="#jharokha" /></svg>
+          <div class="family-inner">
+            <svg class="motif" viewBox="0 0 120 100" aria-hidden="true"><use href="#madhubani-fish" /></svg>
+            <p class="from">The Groom · <span data-bind="groom.city"></span></p>
+            <h3 data-bind="groom.fullName"></h3>
+            <p class="parents" data-bind="groom.parents"></p>
+          </div>
         </article>
       </div>
       <p class="blurb">
@@ -90,10 +98,9 @@
     <!-- ===== Events ===== -->
     <section class="section events" id="events">
       <p class="eyebrow">The festivities</p>
-      <h2>Wedding Events</h2>
+      <h2>The Programme</h2>
       <div class="divider" aria-hidden="true"></div>
-      <div class="event-list" id="eventList"></div>
-      <p class="meals">🍽️ <span data-bind="mealsNote"></span></p>
+      <div class="days" id="eventList"></div>
     </section>
 
     <!-- ===== Venue ===== -->
@@ -124,7 +131,6 @@
         </fieldset>
 
         <label>Your name<input name="name" required autocomplete="name" placeholder="Full name" /></label>
-        <label>WhatsApp number<input name="phone" required type="tel" inputmode="tel" autocomplete="tel" placeholder="10-digit mobile" /></label>
 
         <div class="if-yes">
           <label>Number of guests (including you)
@@ -166,6 +172,51 @@
 
   <!-- Shared SVG symbols -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <linearGradient id="maroonFill" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#7a1729" /><stop offset="1" stop-color="#3a0812" />
+      </linearGradient>
+      <linearGradient id="goldLine" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#f7e2a3" /><stop offset=".5" stop-color="#c9a24a" /><stop offset="1" stop-color="#a57d2c" />
+      </linearGradient>
+      <g id="fish" stroke="#ecd08a" stroke-width="2" stroke-linejoin="round">
+        <path d="M-40 0 C-25 -18 15 -18 28 0 C15 18 -25 18 -40 0 Z" fill="#d6336c" />
+        <path d="M28 0 L46 -14 L40 0 L46 14 Z" fill="#f2a516" />
+        <path d="M-14 -12 C-10 -4 -10 4 -14 12 M-4 -13 C0 -4 0 4 -4 13 M6 -12 C10 -4 10 4 6 12" fill="none" />
+        <circle cx="-29" cy="-3" r="2.5" fill="#ecd08a" stroke="none" />
+      </g>
+    </defs>
+    <!-- Jharokha (palace window) arch frame -->
+    <symbol id="jharokha" viewBox="0 0 300 420">
+      <path d="M10 410 V150 C10 100 62 80 102 66 C132 55 146 38 150 16 C154 38 168 55 198 66 C238 80 290 100 290 150 V410 Z" fill="url(#maroonFill)" stroke="url(#goldLine)" stroke-width="3" vector-effect="non-scaling-stroke" />
+      <path d="M22 398 V154 C22 110 68 92 106 78 C134 68 146 54 150 36 C154 54 166 68 194 78 C232 92 278 110 278 154 V398 Z" fill="none" stroke="#c9a24a" stroke-width="1" stroke-dasharray="1 5" stroke-linecap="round" vector-effect="non-scaling-stroke" />
+      <path d="M32 388 V158 C32 118 74 102 110 89 C136 80 147 68 150 54 C153 68 164 80 190 89 C226 102 268 118 268 158 V388 Z" fill="none" stroke="#c9a24a" stroke-opacity=".55" stroke-width="1" vector-effect="non-scaling-stroke" />
+      <g fill="#ecd08a"><circle cx="150" cy="8" r="5" /><path d="M150 0 C146 -8 154 -8 150 0" /></g>
+      <g fill="#c9a24a" opacity=".9">
+        <circle cx="32" cy="388" r="4" /><circle cx="268" cy="388" r="4" />
+        <circle cx="32" cy="158" r="3" /><circle cx="268" cy="158" r="3" />
+      </g>
+    </symbol>
+    <!-- Phulkari star flower (Delhi / Punjab embroidery) -->
+    <symbol id="phulkari" viewBox="-50 -50 100 100">
+      <g fill="url(#goldLine)">
+        <path d="M0 -46 L11 -20 L0 -9 L-11 -20 Z" />
+        <path d="M0 -46 L11 -20 L0 -9 L-11 -20 Z" transform="rotate(45)" />
+        <path d="M0 -46 L11 -20 L0 -9 L-11 -20 Z" transform="rotate(90)" />
+        <path d="M0 -46 L11 -20 L0 -9 L-11 -20 Z" transform="rotate(135)" />
+        <path d="M0 -46 L11 -20 L0 -9 L-11 -20 Z" transform="rotate(180)" />
+        <path d="M0 -46 L11 -20 L0 -9 L-11 -20 Z" transform="rotate(225)" />
+        <path d="M0 -46 L11 -20 L0 -9 L-11 -20 Z" transform="rotate(270)" />
+        <path d="M0 -46 L11 -20 L0 -9 L-11 -20 Z" transform="rotate(315)" />
+      </g>
+      <circle r="9" fill="#d6336c" stroke="#ecd08a" stroke-width="2" />
+      <circle r="3" fill="#ecd08a" />
+    </symbol>
+    <!-- Madhubani fish pair (Bihar — a symbol of fertility and good fortune at weddings) -->
+    <symbol id="madhubani-fish" viewBox="-60 -50 120 100">
+      <use href="#fish" transform="translate(0 -21)" />
+      <use href="#fish" transform="translate(0 21) scale(-1 1)" />
+    </symbol>
     <symbol id="om" viewBox="0 0 100 100">
       <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="2" />
       <circle cx="50" cy="50" r="38" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="2 4" />

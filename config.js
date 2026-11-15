@@ -5,15 +5,15 @@
 window.WEDDING = {
   bride: {
     name: "Srishti",
-    fullName: "Srishti [Surname]",
+    fullName: "Srishti Jain",
     city: "New Delhi",
-    parents: "D/o [Mr. & Mrs. Bride's Parents]",
+    parents: "Daughter of Mr. Kamlesh Jain & Mrs. [Mother's Name]",
   },
   groom: {
     name: "Shubham",
     fullName: "Shubham [Surname]",
     city: "[City], Bihar",
-    parents: "S/o [Mr. & Mrs. Groom's Parents]",
+    parents: "Son of Mr. Surendra Prasad & Mrs. [Mother's Name]",
   },
 
   hashtag: "#SriShubhVivah",
@@ -32,19 +32,32 @@ window.WEDDING = {
     mapsEmbed: "https://www.google.com/maps?q=Nature+Knots,+Nrithyagram,+Hesaraghatta,+Bengaluru&output=embed",
   },
 
-  // Edit, add or remove events freely. "time", "dress" and "note" are optional.
-  // Replace "Morning" etc. with exact times once fixed, e.g. "9:30 AM".
-  events: [
-    { name: "Puja", hindi: "पूजा", date: "Sunday, 17 Jan 2027", time: "Morning", note: "We begin with blessings for the days ahead." },
-    { name: "Haldi", hindi: "हल्दी", date: "Sunday, 17 Jan 2027", time: "Afternoon", dress: "Yellow", note: "Turmeric, laughter and a lot of mess." },
-    { name: "Sangeet", hindi: "संगीत", date: "Sunday, 17 Jan 2027", time: "Night", dress: "Festive / Indo-western", note: "Dhol, dance-offs and Delhi-meets-Bihar beats." },
-    { name: "Puja", hindi: "पूजा", date: "Monday, 18 Jan 2027", time: "Morning", note: "Wedding-day rituals with the families." },
-    { name: "Baraat", hindi: "बारात", date: "Monday, 18 Jan 2027", time: "Afternoon", dress: "Traditional", note: "Dance the groom all the way to the mandap." },
-    { name: "Vivah", hindi: "विवाह", date: "Monday, 18 Jan 2027", time: "Evening", dress: "Traditional", note: "The pheras — the moment we've all been waiting for." },
-    { name: "Reception", hindi: "स्वागत समारोह", date: "Monday, 18 Jan 2027", time: "Night", dress: "Formal / Glam", note: "Celebrate the newlyweds over dinner and music." },
-    { name: "Vidaai", hindi: "विदाई", date: "Tuesday, 19 Jan 2027", time: "Morning", note: "Shubham takes Srishti home as the families send them off with love." },
+  // Day-by-day programme, in order of time. Replace "[Time]" and "[Dress code]" once fixed.
+  days: [
+    {
+      label: "Day One", date: "Sunday, 17 January 2027", short: "Sun, 17 Jan",
+      events: [
+        { name: "Puja", hindi: "पूजा", period: "Morning", time: "[Time]", dress: "[Dress code]" },
+        { name: "Haldi", hindi: "हल्दी", period: "Afternoon", time: "[Time]", dress: "Shades of yellow" },
+        { name: "Sangeet", hindi: "संगीत", period: "Night", time: "[Time]", dress: "Festive / Indo-western" },
+      ],
+    },
+    {
+      label: "Day Two", date: "Monday, 18 January 2027", short: "Mon, 18 Jan",
+      events: [
+        { name: "Puja", hindi: "पूजा", period: "Morning", time: "[Time]", dress: "[Dress code]" },
+        { name: "Baraat", hindi: "बारात", period: "Afternoon", time: "[Time]", dress: "Traditional" },
+        { name: "Vivah", hindi: "विवाह", period: "Evening", time: "[Time]", dress: "Traditional" },
+        { name: "Reception", hindi: "स्वागत समारोह", period: "Night", time: "[Time]", dress: "Formal / Glam" },
+      ],
+    },
+    {
+      label: "Day Three", date: "Tuesday, 19 January 2027", short: "Tue, 19 Jan",
+      events: [
+        { name: "Vidaai", hindi: "विदाई", period: "Morning", time: "[Time]", dress: "[Dress code]" },
+      ],
+    },
   ],
-  mealsNote: "Breakfast, lunch, hi-tea and dinner will be served on all days.",
 
   rsvp: {
     // Guests pick whose side they're from; their RSVP opens a WhatsApp chat with that person.
@@ -62,9 +75,17 @@ window.WEDDING = {
 
   // Points of contact shown on the site
   contacts: [
-    { role: "Bride's side", name: "[Name]", phone: "+91 [XXXXX XXXXX]" },
-    { role: "Groom's side", name: "[Name]", phone: "+91 [XXXXX XXXXX]" },
-    { role: "Wedding Planner · Travel & Stay", name: "Divya", phone: "+91 [XXXXX XXXXX]" },
+    { side: "Bride's side", people: [
+      { name: "Kamlesh Jain", relation: "Father of the bride", phone: "+91 [XXXXX XXXXX]" },
+      { name: "Kanishk Jain", relation: "Brother of the bride", phone: "+91 [XXXXX XXXXX]" },
+    ] },
+    { side: "Groom's side", people: [
+      { name: "Surendra Prasad", relation: "Father of the groom", phone: "+91 77380 12309" },
+      { name: "Shubhika Shubhavee", relation: "Sister of the groom", phone: "+91 77388 36237" },
+    ] },
+    { side: "Wedding planner", people: [
+      { name: "Divya", relation: "Travel & stay", phone: "+91 [XXXXX XXXXX]" },
+    ] },
   ],
 
   // Background music. Either drop an mp3 at `music` (preferred), OR paste a YouTube
