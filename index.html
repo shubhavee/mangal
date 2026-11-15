@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wedding Invitation</title>
+  <meta name="description" content="You are invited to celebrate our wedding in Bengaluru." />
+  <!-- Link preview when shared on WhatsApp -->
+  <meta property="og:title" content="You're invited to our wedding" />
+  <meta property="og:description" content="Delhi ❤ Bihar · Bengaluru · Tap to open your invitation" />
+  <meta property="og:image" content="assets/preview.jpg" />
+  <meta name="theme-color" content="#5c0f1f" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Great+Vibes&family=Marcellus&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ===== Opening envelope (also unlocks music — browsers block autoplay) ===== -->
+  <div id="intro" class="intro">
+    <div class="intro-card">
+      <p class="invocation">॥ श्री गणेशाय नमः ॥</p>
+      <svg class="ganesh" viewBox="0 0 100 100" aria-hidden="true"><use href="#om" /></svg>
+      <p class="intro-small">Together with their families</p>
+      <h1 class="intro-names"><span data-bind="bride.name"></span> <span class="amp">&amp;</span> <span data-bind="groom.name"></span></h1>
+      <p class="intro-small">request the pleasure of your company</p>
+      <button id="openInvite" class="btn btn-gold">Open Invitation</button>
+      <p class="intro-hint">🎵 with music</p>
+    </div>
+  </div>
+
+  <div id="petals" aria-hidden="true"></div>
+
+  <button id="musicBtn" class="music-btn" aria-label="Play or pause music" hidden>
+    <span class="bars"><i></i><i></i><i></i><i></i></span>
+  </button>
+  <audio id="bgm" loop preload="none"></audio>
+
+  <!-- ===== Hero ===== -->
+  <header class="hero">
+    <div class="toran" aria-hidden="true"></div>
+    <div class="arch">
+      <p class="invocation">॥ शुभ विवाह ॥</p>
+      <p class="eyebrow">The wedding of</p>
+      <h1 class="names">
+        <span data-bind="bride.name"></span>
+        <span class="amp">&amp;</span>
+        <span data-bind="groom.name"></span>
+      </h1>
+      <p class="date" data-bind="displayDate"></p>
+      <p class="place">Bengaluru</p>
+      <div class="countdown" id="countdown">
+        <div><b id="cd-d">--</b><span>Days</span></div>
+        <div><b id="cd-h">--</b><span>Hours</span></div>
+        <div><b id="cd-m">--</b><span>Mins</span></div>
+        <div><b id="cd-s">--</b><span>Secs</span></div>
+      </div>
+      <a href="#rsvp" class="btn btn-gold">RSVP</a>
+    </div>
+  </header>
+
+  <main>
+    <!-- ===== Families ===== -->
+    <section class="section families">
+      <p class="eyebrow">Dilli meets Bihar</p>
+      <h2>Two families, one celebration</h2>
+      <div class="divider" aria-hidden="true"></div>
+      <div class="family-grid">
+        <article class="family-card phulkari">
+          <p class="from">From <span data-bind="bride.city"></span></p>
+          <h3 data-bind="bride.fullName"></h3>
+          <p class="parents" data-bind="bride.parents"></p>
+        </article>
+        <div class="heart" aria-hidden="true">❤</div>
+        <article class="family-card madhubani">
+          <p class="from">From <span data-bind="groom.city"></span></p>
+          <h3 data-bind="groom.fullName"></h3>
+          <p class="parents" data-bind="groom.parents"></p>
+        </article>
+      </div>
+      <p class="blurb">
+        Delhi's chaat and Bihar's litti chokha are coming together in the Garden City.
+        Join us in Bengaluru for days full of rituals, music, food and love.
+      </p>
+      <p class="hashtag" data-bind="hashtag"></p>
+    </section>
+
+    <!-- ===== Events ===== -->
+    <section class="section events" id="events">
+      <p class="eyebrow">The festivities</p>
+      <h2>Wedding Events</h2>
+      <div class="divider" aria-hidden="true"></div>
+      <div class="event-list" id="eventList"></div>
+      <p class="meals">🍽️ <span data-bind="mealsNote"></span></p>
+    </section>
+
+    <!-- ===== Venue ===== -->
+    <section class="section venue" id="venue">
+      <p class="eyebrow">Where</p>
+      <h2 data-bind="venue.name"></h2>
+      <div class="divider" aria-hidden="true"></div>
+      <p class="address" data-bind="venue.address"></p>
+      <div class="map-wrap"><iframe id="mapFrame" title="Venue map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
+      <a id="mapsLink" class="btn btn-outline" target="_blank" rel="noopener">Open in Google Maps</a>
+    </section>
+
+    <!-- ===== RSVP ===== -->
+    <section class="section rsvp" id="rsvp">
+      <p class="eyebrow">Kindly respond by <span data-bind="rsvpBy"></span></p>
+      <h2>Will you join us?</h2>
+      <div class="divider" aria-hidden="true"></div>
+
+      <form id="rsvpForm" class="card form" novalidate>
+        <div class="choice" role="radiogroup" aria-label="Attendance">
+          <label class="choice-btn yes"><input type="radio" name="attending" value="Yes" required /><span>🎉 Yes, I'll be there</span></label>
+          <label class="choice-btn no"><input type="radio" name="attending" value="No" /><span>🙏 Sorry, can't make it</span></label>
+        </div>
+
+        <fieldset>
+          <legend>You're from</legend>
+          <div class="choice" id="sideChoice" role="radiogroup" aria-label="Side"></div>
+        </fieldset>
+
+        <label>Your name<input name="name" required autocomplete="name" placeholder="Full name" /></label>
+        <label>WhatsApp number<input name="phone" required type="tel" inputmode="tel" autocomplete="tel" placeholder="10-digit mobile" /></label>
+
+        <div class="if-yes">
+          <label>Number of guests (including you)
+            <select name="guests"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6+</option></select>
+          </label>
+          <fieldset>
+            <legend>Which days will you attend?</legend>
+            <div id="eventChecks" class="checks"></div>
+          </fieldset>
+          <label>Travelling from<input name="from" placeholder="City" /></label>
+        </div>
+        <label>Message for the couple <small>(optional)</small><textarea name="message" rows="2"></textarea></label>
+
+        <button class="btn btn-gold" type="submit">Send RSVP on WhatsApp</button>
+        <p class="hint">Your reply goes privately to the couple. No groups, and nobody else sees it.</p>
+        <p class="form-status" id="rsvpStatus" role="status"></p>
+      </form>
+
+      <div id="rsvpDone" class="card done" hidden>
+        <h3 id="doneTitle"></h3>
+        <p id="doneText"></p>
+        <div class="done-actions" id="doneActions"></div>
+      </div>
+    </section>
+
+    <!-- ===== Travel ===== -->
+    <section class="section travel" id="travel">
+      <p class="eyebrow">Help us plan your pickup &amp; stay</p>
+      <h2>Share your travel details</h2>
+      <div class="divider" aria-hidden="true"></div>
+      <p class="blurb">Booked your tickets? Tell us when you arrive and we'll sort out airport or station pickups. You can come back and update this any time.</p>
+
+      <form id="travelForm" class="card form" novalidate>
+        <div class="row">
+          <label>Your name<input name="name" required placeholder="Full name" /></label>
+          <label>WhatsApp number<input name="phone" required type="tel" inputmode="tel" placeholder="10-digit mobile" /></label>
+        </div>
+        <div class="row">
+          <label>Mode
+            <select name="mode"><option>Flight</option><option>Train</option><option>Bus</option><option>Car</option></select>
+          </label>
+          <label>Flight / Train no.<input name="number" placeholder="e.g. 6E 2131" /></label>
+        </div>
+        <div class="row">
+          <label>Arrival date &amp; time<input name="arrival" type="datetime-local" required /></label>
+          <label>Arriving at<input name="arrivalAt" placeholder="BLR Airport T1 / SBC / Yeshwantpur" /></label>
+        </div>
+        <div class="row">
+          <label>Departure date &amp; time<input name="departure" type="datetime-local" /></label>
+          <label>Travellers<input name="travellers" type="number" min="1" value="1" /></label>
+        </div>
+        <label>Staying at <small>(if booked)</small><input name="stay" placeholder="Hotel name" /></label>
+        <label class="file">Upload ticket <small>(PDF or image, max 5 MB, optional)</small><input name="ticket" type="file" accept=".pdf,image/*" /></label>
+        <button class="btn btn-gold" type="submit">Share Travel Details</button>
+        <p class="form-status" id="travelStatus" role="status"></p>
+      </form>
+    </section>
+
+    <!-- ===== Contacts ===== -->
+    <section class="section contacts">
+      <p class="eyebrow">Questions?</p>
+      <h2>Reach out to us</h2>
+      <div class="divider" aria-hidden="true"></div>
+      <div class="contact-grid" id="contactList"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p class="script-line">With love &amp; blessings</p>
+    <p><span data-bind="bride.name"></span> &amp; <span data-bind="groom.name"></span> · <span data-bind="hashtag"></span></p>
+  </footer>
+
+  <!-- Shared SVG symbols -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="om" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="2" />
+      <circle cx="50" cy="50" r="38" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="2 4" />
+      <text x="50" y="66" text-anchor="middle" font-size="46" fill="currentColor" font-family="Tiro Devanagari Hindi, serif">ॐ</text>
+    </symbol>
+  </svg>
+
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
