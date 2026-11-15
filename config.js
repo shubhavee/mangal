@@ -70,5 +70,5 @@ window.WEDDING = {
   // Background music. Either drop an mp3 at `music` (preferred), OR paste a YouTube
   // link/ID in `musicYouTube` (used only when the mp3 is missing). Button hides if neither works.
   music: "assets/music.mp3",
-  musicYouTube: "https://www.youtube.com/watch?v=bXUKv9nzWV8", // Kudmayi on piano (placeholder)
+  musicYouTube: "https://www.youtube.com/watch?v=3qpxJEp4Ec4", // Kudmayi (Film Version), Saregama
 };
