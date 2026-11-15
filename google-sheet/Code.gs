@@ -9,7 +9,7 @@
 
 // One tick-box column per wedding day; must match the "key" of each day in the website's config.js.
 const DAY_KEYS = ["17 Jan", "18 Jan", "19 Jan"];
-const RSVP_HEADERS = ["Updated", "Name", "Phone", "Attending", "Side", "Guests", ...DAY_KEYS, "From", "Message", "Source", "Ticket received?"];
+const RSVP_HEADERS = ["Updated", "Name", "Phone", "Attending", "Side", "Guests", ...DAY_KEYS, "From", "Message", "Ticket received?"];
 
 function doPost(e) {
   const lock = LockService.getScriptLock();
@@ -32,11 +32,12 @@ function doGet() {
 function saveRsvp(d) {
   const sh = tab("RSVPs", RSVP_HEADERS);
   syncHeaders(sh);
-  const row = [new Date(), d.name, d.phone ? "'" + d.phone : "", d.attending, d.side || "", d.guests || "", ...DAY_KEYS.map((k) => (d.days || []).includes(k)), d.from || "", d.message || "", d.source || "Website"];
+  const row = [new Date(), d.name, d.phone ? "'" + d.phone : "", d.attending, d.side || "", d.guests || "", ...DAY_KEYS.map((k) => (d.days || []).includes(k)), d.from || "", d.message || ""];
   // Same phone number again = guest changed their answer → update their row (keeps "Ticket received?").
   const r = findRow(sh, d.phone);
   const rowNum = r || sh.getLastRow() + 1;
   sh.getRange(rowNum, 1, 1, row.length).setValues([row]);
+  sh.getRange(rowNum, 1).setNumberFormat("dd/MM/yyyy HH:mm:ss");
   // Show the day columns as tick boxes without changing their true/false values.
   const tick = SpreadsheetApp.newDataValidation().requireCheckbox().build();
   sh.getRange(rowNum, RSVP_HEADERS.indexOf(DAY_KEYS[0]) + 1, 1, DAY_KEYS.length).setDataValidation(tick);

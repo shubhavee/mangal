@@ -215,7 +215,7 @@
     const btn = $("#rsvpSubmit");
     btn.disabled = true; status.textContent = "Sending…";
     try {
-      await sendToSheet({ type: "rsvp", ...d, source: "Website" });
+      await sendToSheet({ type: "rsvp", ...d });
     } catch {
       btn.disabled = false;
       return (status.textContent = "Couldn't send. Please check your internet connection and try again.");
