@@ -250,7 +250,7 @@
   const travelForm = $("#travelForm");
   const params = new URLSearchParams(location.search);
   if (params.get("name")) travelForm.name.value = params.get("name");
-  if (params.get("phone")) travelForm.phone.value = params.get("phone");
+  const travelPhone = phone10(params.get("phone")); // from the personal reminder link, if any
 
   const toBase64 = (file) => new Promise((res, rej) => {
     const r = new FileReader();
@@ -261,30 +261,30 @@
   travelForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const status = $("#travelStatus");
-    const d = formData(travelForm);
+    const name = travelForm.name.value.trim();
     const file = travelForm.ticket.files[0];
-    if (!d.name?.trim()) return (status.textContent = "Please enter your name.");
-    if (phone10(d.phone).length !== 10) return (status.textContent = "Please enter a valid 10-digit mobile number.");
-    if (!d.arrival) return (status.textContent = "Please enter your arrival date & time.");
-    if (file && file.size > 5 * 1024 * 1024) return (status.textContent = "Ticket file is over 5 MB. Please upload a smaller file or screenshot.");
+    if (!name) return (status.textContent = "Please enter your name.");
+    if (!file) return (status.textContent = "Please choose your ticket file.");
+    if (file.size > 5 * 1024 * 1024) return (status.textContent = "That file is over 5 MB. Please upload a smaller file or a screenshot.");
 
     const btn = $("button[type=submit]", travelForm);
-    btn.disabled = true; status.textContent = "Sending…";
+    btn.disabled = true; status.textContent = "Uploading…";
 
     if (W.rsvp.sheetEndpoint) {
       try {
-        const payload = { type: "travel", ...d, phone: phone10(d.phone) };
-        if (file) Object.assign(payload, { fileName: file.name, fileType: file.type, fileData: await toBase64(file) });
-        await sendToSheet(payload);
-        status.textContent = "Thank you! We've got your travel details ✈️";
+        await sendToSheet({ type: "travel", name, phone: travelPhone, fileName: file.name, fileType: file.type, fileData: await toBase64(file) });
+        status.textContent = "Thank you! We've got your ticket ✈️";
         travelForm.reset();
-      } catch { status.textContent = "Couldn't send. Please try again."; }
+      } catch { status.textContent = "Couldn't upload. Please try again."; }
     } else {
-      const text = [`Travel details for ${W.bride.name} & ${W.groom.name}'s wedding`, `Name: ${d.name}`, `Phone: ${d.phone}`,
-        `Mode: ${d.mode} ${d.number || ""}`, `Arrival: ${d.arrival} at ${d.arrivalAt || "-"}`, `Departure: ${d.departure || "-"}`,
-        `Travellers: ${d.travellers}`, `Stay: ${d.stay || "-"}`, file ? "(Attaching ticket below)" : ""].join("\n");
-      window.open(waLink(W.rsvp.fallbackNumber, text), "_blank");
-      status.textContent = file ? "Opening WhatsApp. Please attach your ticket in the chat." : "Opening WhatsApp…";
+      // No sheet yet → hand the file to WhatsApp via the phone's share menu, or fall back to a chat.
+      const text = `${name}'s travel ticket for ${W.bride.name} & ${W.groom.name}'s wedding`;
+      if (navigator.canShare?.({ files: [file] })) {
+        try { await navigator.share({ files: [file], text }); status.textContent = "Thank you! ✈️"; } catch { status.textContent = ""; }
+      } else {
+        window.open(waLink(W.rsvp.fallbackNumber, text), "_blank");
+        status.textContent = "Opening WhatsApp. Please attach your ticket in the chat.";
+      }
     }
     btn.disabled = false;
   });

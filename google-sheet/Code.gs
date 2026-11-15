@@ -10,7 +10,7 @@
 const TICKETS_FOLDER = "Wedding Travel Tickets";
 
 const RSVP_HEADERS = ["Updated", "Name", "Phone", "Attending", "Side", "Guests", "Days", "From", "Message", "Source", "Travel shared?"];
-const TRAVEL_HEADERS = ["Submitted", "Name", "Phone", "Mode", "Flight/Train", "Arrival", "Arriving at", "Departure", "Travellers", "Stay", "Ticket link", "Source"];
+const TRAVEL_HEADERS = ["Submitted", "Name", "Phone", "Ticket link"];
 
 function doPost(e) {
   const lock = LockService.getScriptLock();
@@ -46,12 +46,9 @@ function saveTravel(d) {
     const blob = Utilities.newBlob(Utilities.base64Decode(d.fileData), d.fileType || "application/octet-stream", `${d.name} - ${d.phone} - ${d.fileName || "ticket"}`);
     link = folder().createFile(blob).getUrl();
   }
-  tab("Travel", TRAVEL_HEADERS).appendRow([
-    new Date(), d.name, "'" + d.phone, d.mode || "", d.number || "", d.arrival || "", d.arrivalAt || "",
-    d.departure || "", d.travellers || "", d.stay || "", link, d.source || "Website",
-  ]);
+  tab("Travel", TRAVEL_HEADERS).appendRow([new Date(), d.name, d.phone ? "'" + d.phone : "", link]);
   const rs = tab("RSVPs", RSVP_HEADERS);
-  const r = findRow(rs, d.phone);
+  const r = d.phone ? findRow(rs, d.phone) : findRowByName(rs, d.name);
   if (r) rs.getRange(r, RSVP_HEADERS.indexOf("Travel shared?") + 1).setValue("Yes");
 }
 
@@ -119,6 +116,13 @@ function findRow(sh, phone) {
   for (let i = 1; i < phones.length; i++) {
     if (String(phones[i][0]).replace(/\D/g, "").slice(-10) === want) return i + 1;
   }
+  return 0;
+}
+
+function findRowByName(sh, name) {
+  const want = String(name).trim().toLowerCase();
+  const names = sh.getRange(1, 2, Math.max(sh.getLastRow(), 1), 1).getValues();
+  for (let i = 1; i < names.length; i++) if (String(names[i][0]).trim().toLowerCase() === want) return i + 1;
   return 0;
 }
 

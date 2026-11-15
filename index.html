@@ -151,33 +151,15 @@
 
     <!-- ===== Travel ===== -->
     <section class="section travel" id="travel">
-      <p class="eyebrow">Help us plan your pickup &amp; stay</p>
-      <h2>Share your travel details</h2>
+      <p class="eyebrow">Help us plan your pickup</p>
+      <h2>Share your tickets</h2>
       <div class="divider" aria-hidden="true"></div>
-      <p class="blurb">Booked your tickets? Tell us when you arrive and we'll sort out airport or station pickups. You can come back and update this any time.</p>
+      <p class="blurb">Booked your travel? Just upload your ticket and we'll take care of pickups from the airport or station.</p>
 
       <form id="travelForm" class="card form" novalidate>
-        <div class="row">
-          <label>Your name<input name="name" required placeholder="Full name" /></label>
-          <label>WhatsApp number<input name="phone" required type="tel" inputmode="tel" placeholder="10-digit mobile" /></label>
-        </div>
-        <div class="row">
-          <label>Mode
-            <select name="mode"><option>Flight</option><option>Train</option><option>Bus</option><option>Car</option></select>
-          </label>
-          <label>Flight / Train no.<input name="number" placeholder="e.g. 6E 2131" /></label>
-        </div>
-        <div class="row">
-          <label>Arrival date &amp; time<input name="arrival" type="datetime-local" required /></label>
-          <label>Arriving at<input name="arrivalAt" placeholder="BLR Airport T1 / SBC / Yeshwantpur" /></label>
-        </div>
-        <div class="row">
-          <label>Departure date &amp; time<input name="departure" type="datetime-local" /></label>
-          <label>Travellers<input name="travellers" type="number" min="1" value="1" /></label>
-        </div>
-        <label>Staying at <small>(if booked)</small><input name="stay" placeholder="Hotel name" /></label>
-        <label class="file">Upload ticket <small>(PDF or image, max 5 MB, optional)</small><input name="ticket" type="file" accept=".pdf,image/*" /></label>
-        <button class="btn btn-gold" type="submit">Share Travel Details</button>
+        <label>Your name<input name="name" required autocomplete="name" placeholder="Full name" /></label>
+        <label class="file">Ticket <small>(PDF or screenshot, max 5 MB)</small><input name="ticket" type="file" accept=".pdf,image/*" required /></label>
+        <button class="btn btn-gold" type="submit">Share Ticket</button>
         <p class="form-status" id="travelStatus" role="status"></p>
       </form>
     </section>
