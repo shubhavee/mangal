@@ -7,7 +7,7 @@ window.WEDDING = {
     name: "Srishti",
     fullName: "Srishti Jain",
     city: "New Delhi",
-    parents: "Daughter of Mr. Kamlesh Jain & Mrs. [Mother's Name]",
+    parents: "Daughter of Mr. Kamlesh Kumar Jain & Mrs. Shashi Jain",
   },
   groom: {
     name: "Shubham",
@@ -76,7 +76,7 @@ window.WEDDING = {
   // Points of contact shown on the site
   contacts: [
     { side: "Bride's side", people: [
-      { name: "Kamlesh Jain", relation: "Father of the bride", phone: "+91 [XXXXX XXXXX]" },
+      { name: "Kamlesh Kumar Jain", relation: "Father of the bride", phone: "+91 [XXXXX XXXXX]" },
       { name: "Kanishk Jain", relation: "Brother of the bride", phone: "+91 [XXXXX XXXXX]" },
     ] },
     { side: "Groom's side", people: [
