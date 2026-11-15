@@ -31,16 +31,16 @@ function doGet() {
 
 function saveRsvp(d) {
   const sh = tab("RSVPs", RSVP_HEADERS);
-  syncHeaders(sh);
-  const row = [new Date(), d.name, d.phone ? "'" + d.phone : "", d.attending, d.side || "", d.guests || "", ...DAY_KEYS.map((k) => (d.days || []).includes(k)), d.from || "", d.message || ""];
+  ensureLayout(sh);
+  const row = [new Date(), d.name, d.phone ? "'" + d.phone : "", d.attending, d.side || "", d.guests || "", ...DAY_KEYS.map((k) => ((d.days || []).includes(k) ? "Yes" : "No")), d.from || "", d.message || ""];
   // Same phone number again = guest changed their answer → update their row (keeps "Ticket received?").
   const r = findRow(sh, d.phone);
   const rowNum = r || sh.getLastRow() + 1;
   sh.getRange(rowNum, 1, 1, row.length).setValues([row]);
   sh.getRange(rowNum, 1).setNumberFormat("dd/MM/yyyy HH:mm:ss");
-  // Show the day columns as tick boxes without changing their true/false values.
-  const tick = SpreadsheetApp.newDataValidation().requireCheckbox().build();
-  sh.getRange(rowNum, RSVP_HEADERS.indexOf(DAY_KEYS[0]) + 1, 1, DAY_KEYS.length).setDataValidation(tick);
+  // Day columns are Yes/No dropdowns (harder to flip by accident than a tick box).
+  const yesNo = SpreadsheetApp.newDataValidation().requireValueInList(["Yes", "No"], true).setAllowInvalid(false).build();
+  sh.getRange(rowNum, RSVP_HEADERS.indexOf(DAY_KEYS[0]) + 1, 1, DAY_KEYS.length).setDataValidation(yesNo);
   if (!r) sh.getRange(rowNum, RSVP_HEADERS.length).insertCheckboxes();
 }
 
@@ -105,16 +105,27 @@ function findRow(sh, phone) {
   return 0;
 }
 
-// Keeps the header row in step with RSVP_HEADERS if columns were added after the tab was created.
-function syncHeaders(sh) {
-  const cur = sh.getRange(1, 1, 1, RSVP_HEADERS.length).getDisplayValues()[0];
-  if (cur.join("|") !== RSVP_HEADERS.join("|")) {
-    // "@" = plain text, so headers like "17 Jan" aren't turned into dates.
-    sh.getRange(1, 1, 1, RSVP_HEADERS.length).setNumberFormat("@").setValues([RSVP_HEADERS])
-      .setFontWeight("bold").setBackground("#f6e7c4").setHorizontalAlignment("left");
-    const extra = sh.getLastColumn() - RSVP_HEADERS.length; // leftover headers from an older layout
-    if (extra > 0) sh.getRange(1, RSVP_HEADERS.length + 1, 1, extra).clearContent().setBackground(null);
-  }
+// Bump this whenever RSVP_HEADERS or the formatting below changes; the sheet is re-laid-out once.
+const LAYOUT_VERSION = "3";
+
+// Header row as plain text (so "17 Jan" isn't read as a date), Yes = green / No = red colouring.
+function ensureLayout(sh) {
+  const props = PropertiesService.getDocumentProperties();
+  if (props.getProperty("layout") === LAYOUT_VERSION) return;
+  const n = RSVP_HEADERS.length;
+  sh.getRange(1, 1, 1, n).setNumberFormat("@").setValues([RSVP_HEADERS])
+    .setFontWeight("bold").setBackground("#f6e7c4").setHorizontalAlignment("left");
+  const extra = sh.getLastColumn() - n; // leftover headers from an older layout
+  if (extra > 0) sh.getRange(1, n + 1, 1, extra).clearContent().setBackground(null);
+
+  const col = (h) => RSVP_HEADERS.indexOf(h) + 1;
+  const ranges = [sh.getRange(2, col("Attending"), sh.getMaxRows() - 1, 1),
+                  sh.getRange(2, col(DAY_KEYS[0]), sh.getMaxRows() - 1, DAY_KEYS.length)];
+  const rule = (text, bg, fg) => SpreadsheetApp.newConditionalFormatRule()
+    .whenTextEqualTo(text).setBackground(bg).setFontColor(fg).setBold(true).setRanges(ranges).build();
+  sh.setConditionalFormatRules([rule("Yes", "#d8f3e1", "#1b7a43"), rule("No", "#fbdcdc", "#b3261e")]);
+  sh.getRange(2, col(DAY_KEYS[0]), sh.getMaxRows() - 1, DAY_KEYS.length).setHorizontalAlignment("center");
+  props.setProperty("layout", LAYOUT_VERSION);
 }
 
 function json(obj) {
