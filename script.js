@@ -89,12 +89,10 @@
   const audio = $("#bgm"), musicBtn = $("#musicBtn");
   const start = W.musicStart || 0;
   const setPlaying = (on) => musicBtn.classList.toggle("playing", on);
-  // Guest's on/off choice, remembered for their next visit.
+  // Music is on whenever the page loads; the button only pauses it for this visit.
   let musicOn = true;
-  try { musicOn = localStorage.getItem("music") !== "off"; } catch {}
   function setMusicOn(on) {
     musicOn = on;
-    try { localStorage.setItem("music", on ? "on" : "off"); } catch {}
     musicBtn.setAttribute("aria-pressed", on);
     $(".music-label", musicBtn).textContent = on ? "Music On" : "Music Off";
     on ? player.play() : player.pause();
@@ -118,6 +116,10 @@
   });
   audio.load();
   musicBtn.addEventListener("click", () => setMusicOn(!musicOn));
+  // If the browser blocked playback (e.g. the player wasn't ready yet), start on the next tap anywhere.
+  const resume = (e) => { if (opened && musicOn && player.paused() && !musicBtn.contains(e.target)) player.play(); };
+  document.addEventListener("pointerdown", resume, true);
+  document.addEventListener("keydown", resume, true);
 
   // YouTube fallback: the player is kept invisible so only the audio comes through.
   function loadYouTube() {
