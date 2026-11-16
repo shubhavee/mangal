@@ -7,9 +7,10 @@
  * Ticket follow-ups: menu 💍 Wedding → Build ticket follow-up links (see README.md).
  */
 
-// One tick-box column per wedding day; must match the "key" of each day in the website's config.js.
-const DAY_KEYS = ["17 Jan", "18 Jan", "19 Jan"];
-const RSVP_HEADERS = ["Updated", "Name", "Phone", "Attending", "Side", "Guests", ...DAY_KEYS, "From", "Message", "Ticket received?"];
+// One Yes/No column per RSVP day; must match the "key" of each day in the website's config.js.
+// Guests on the 18-Jan-only invitation never pick 17 Jan, so theirs is always "No".
+const DAY_KEYS = ["17 Jan", "18 Jan"];
+const RSVP_HEADERS = ["Updated", "Name", "Phone", "Invited for", "Attending", "Guests", ...DAY_KEYS, "From", "Message", "Ticket received?"];
 
 function doPost(e) {
   const lock = LockService.getScriptLock();
@@ -32,7 +33,7 @@ function doGet() {
 function saveRsvp(d) {
   const sh = tab("RSVPs", RSVP_HEADERS);
   ensureLayout(sh);
-  const row = [new Date(), d.name, d.phone ? "'" + d.phone : "", d.attending, d.side || "", d.guests || "", ...DAY_KEYS.map((k) => ((d.days || []).includes(k) ? "Yes" : "No")), d.from || "", d.message || ""];
+  const row = [new Date(), d.name, d.phone ? "'" + d.phone : "", d.invite || "", d.attending, d.guests || "", ...DAY_KEYS.map((k) => ((d.days || []).includes(k) ? "Yes" : "No")), d.from || "", d.message || ""];
   // Same phone number again = guest changed their answer → update their row (keeps "Ticket received?").
   const r = findRow(sh, d.phone);
   const rowNum = r || sh.getLastRow() + 1;
@@ -106,7 +107,7 @@ function findRow(sh, phone) {
 }
 
 // Bump this whenever RSVP_HEADERS or the formatting below changes; the sheet is re-laid-out once.
-const LAYOUT_VERSION = "3";
+const LAYOUT_VERSION = "4";
 
 // Header row as plain text (so "17 Jan" isn't read as a date), Yes = green / No = red colouring.
 function ensureLayout(sh) {

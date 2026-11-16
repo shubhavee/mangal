@@ -1,5 +1,12 @@
 (() => {
   const W = window.WEDDING;
+  const SCRIPT_URL = document.currentScript.src; // asset paths resolve from here, so /wedding-day/ works too
+  // Which invitation this page is: wedding-day/index.html sets <html data-invite="day">.
+  const INVITE = document.documentElement.dataset.invite === "day" ? "day" : "full";
+  const invite = W.invites[INVITE];
+  W.displayDate = invite.displayDate;
+  const days = W.days.filter((d) => d.invites.includes(INVITE));
+  const rsvpDays = days.filter((d) => d.rsvp);
   const $ = (s, el = document) => el.querySelector(s);
   const get = (path) => path.split(".").reduce((o, k) => (o ? o[k] : undefined), W);
   const digits = (s) => String(s || "").replace(/\D/g, "");
@@ -17,10 +24,10 @@
   $("#mapFrame").src = W.venue.mapsEmbed;
   $("#mapsLink").href = W.venue.mapsLink;
 
-  $("#eventList").innerHTML = W.days.map((day) => `
+  $("#eventList").innerHTML = days.map((day) => `
     <article class="day">
       <header class="day-head">
-        <p class="day-label">${esc(day.label)}</p>
+        <p class="day-label">${esc(INVITE === "day" && day.dayOnlyLabel ? day.dayOnlyLabel : day.label)}</p>
         <h3>${esc(day.date)}</h3>
       </header>
       <ol class="timeline">
@@ -36,11 +43,10 @@
       </ol>
     </article>`).join("");
 
-  $("#eventChecks").innerHTML = W.days.map((day) =>
+  // Only ask "which days" when there's more than one day to choose from.
+  $("#eventChecks").innerHTML = rsvpDays.map((day) =>
     `<label title="${esc(day.events.map((e) => e.name).join(", "))}"><input type="checkbox" name="days" value="${esc(day.key)}" checked /> ${esc(day.short)}</label>`).join("");
-
-  $("#sideChoice").innerHTML = W.rsvp.sides.map((s, i) =>
-    `<label class="choice-btn side"><input type="radio" name="side" value="${i}" required /><span>${esc(s.label)}</span></label>`).join("");
+  $("#daysField").hidden = rsvpDays.length < 2;
   const sideNumber = (side) => (digits(side.whatsapp).length >= 10 ? side.whatsapp : W.rsvp.fallbackNumber);
 
   $("#contactList").innerHTML = W.contacts.map((g) => `
@@ -56,6 +62,18 @@
         </p>
       </div>`).join("")}
     </div>`).join("");
+
+  /* ---------- Hero mandala (fine gold line-art, built from repeated petals) ---------- */
+  (() => {
+    const ring = (n, make) => Array.from({ length: n }, (_, i) => `<g transform="rotate(${(i * 360) / n})">${make(i)}</g>`).join("");
+    $("#mandala").innerHTML = `<g fill="none" stroke="currentColor" stroke-width=".5">
+      <circle r="98" /><circle r="93" stroke-dasharray="1 3" /><circle r="62" /><circle r="41" /><circle r="17" />
+      ${ring(36, () => '<path d="M0 -91 C6 -82 6 -72 0 -64 C-6 -72 -6 -82 0 -91 Z" />')}
+      ${ring(18, () => '<path d="M0 -60 C11 -54 11 -46 0 -42 C-11 -46 -11 -54 0 -60 Z" /><path d="M0 -58 V-44" />')}
+      ${ring(12, () => '<path d="M0 -39 C9 -31 9 -23 0 -19 C-9 -23 -9 -31 0 -39 Z" />')}
+      ${ring(8, () => '<path d="M0 -16 C5 -11 5 -6 0 -3 C-5 -6 -5 -11 0 -16 Z" />')}
+    </g><g fill="currentColor">${ring(72, () => '<circle cy="-95.5" r=".8" />')}${ring(18, () => '<circle cy="-66" r="1.3" />')}</g>`;
+  })();
 
   /* ---------- Scroll reveal ---------- */
   const io = new IntersectionObserver((entries) => entries.forEach((en) => {
@@ -110,7 +128,7 @@
     paused: () => (useYt ? yt?.getPlayerState?.() !== 1 : audio.paused),
   };
   audio.preload = "metadata"; // so a missing file errors early and we can fall back
-  audio.src = W.music;
+  audio.src = new URL(W.music, SCRIPT_URL).href;
   audio.addEventListener("play", () => setPlaying(true));
   audio.addEventListener("pause", () => setPlaying(false));
   audio.addEventListener("loadedmetadata", () => { if (audio.currentTime < start) audio.currentTime = start; });
@@ -207,15 +225,16 @@
     const status = $("#rsvpStatus");
     const d = formData(rsvpForm);
     if (!d.attending) return (status.textContent = "Please choose Yes or No.");
-    if (d.side === undefined) return (status.textContent = "Please choose whose side you're from.");
     if (!d.name?.trim()) return (status.textContent = "Please enter your name.");
     d.phone = digits(d.phone).slice(-10);
     if (d.phone.length !== 10) return (status.textContent = "Please enter your 10-digit WhatsApp number.");
-    // One true/false per day, so the Sheet can show a tick box for each (17, 18, 19 Jan).
-    d.days = d.attending === "Yes" ? [...rsvpForm.querySelectorAll('input[name="days"]:checked')].map((c) => c.value) : [];
+    // Days attending, so the Sheet can show Yes/No per day. Single-day invitations attend that day.
+    const picked = rsvpDays.length < 2 ? rsvpDays.map((day) => day.key)
+      : [...rsvpForm.querySelectorAll('input[name="days"]:checked')].map((c) => c.value);
+    d.days = d.attending === "Yes" ? picked : [];
+    d.invite = invite.label;
     if (d.attending === "No") { delete d.guests; delete d.from; }
     d.name = d.name.trim();
-    d.side = W.rsvp.sides[d.side].label;
 
     const btn = $("#rsvpSubmit");
     btn.disabled = true; status.textContent = "Sending…";
@@ -239,7 +258,7 @@
       $("#doneText").innerHTML = `Thank you for letting us know, ${first}. Your blessings mean the world to us.`;
     } else {
       $("#doneTitle").textContent = "Yay! See you in Bengaluru 🎉";
-      $("#doneText").innerHTML = `Thank you, ${first}! We've received your RSVP. Our wedding planner will get in touch closer to the date about your travel and pickup.`;
+      $("#doneText").innerHTML = `Thank you, ${first}! We've received your RSVP. ${INVITE === "full" ? "Our wedding planner will get in touch closer to the date about your travel and stay." : "We can't wait to celebrate with you."}`;
       if (!reduced) burst(60);
     }
     $("#doneText").insertAdjacentHTML("beforeend", "<br><br>Need to change your answer? Just submit the form again with the same number.");

@@ -122,12 +122,23 @@ small { color: var(--muted); font-size: .8em; }
     linear-gradient(180deg, #4a0b18, var(--maroon) 55%, #6e1426);
   color: var(--cream); text-align: center; overflow: hidden;
 }
-.hero::after { /* mandala glow */
-  content: ""; position: absolute; width: 720px; height: 720px; left: 50%; top: 50%; translate: -50% -50%;
-  background: repeating-conic-gradient(from 0deg, rgba(236,208,138,.07) 0 6deg, transparent 6deg 15deg);
-  border-radius: 50%; mask: radial-gradient(circle, transparent 28%, #000 30%, #000 68%, transparent 70%);
-  animation: spin 120s linear infinite; pointer-events: none;
+.mandala {
+  position: absolute; width: min(860px, 170vw); aspect-ratio: 1; left: 50%; top: 52%; translate: -50% -50%;
+  color: #ecd08a; opacity: .2; animation: spin 240s linear infinite; pointer-events: none;
 }
+.lanterns { position: absolute; top: 56px; display: flex; gap: clamp(14px, 3vw, 46px); z-index: 1; pointer-events: none; }
+.lanterns.left { left: clamp(14px, 7vw, 140px); }
+.lanterns.right { right: clamp(14px, 7vw, 140px); flex-direction: row-reverse; }
+.lantern { display: block; width: clamp(20px, 2.6vw, 34px); transform-origin: 50% 0; animation: sway 6s ease-in-out infinite; }
+.lantern:nth-child(2) { animation-delay: -2s; } .lantern:nth-child(3) { animation-delay: -4s; }
+.lantern::before { content: ""; display: block; width: 1px; height: var(--drop); margin: 0 auto; background: linear-gradient(#c9a24a, #ecd08a); }
+.lantern svg { display: block; width: 100%; height: auto; filter: drop-shadow(0 4px 10px rgba(255, 200, 90, .35)); }
+@keyframes sway { 0%, 100% { rotate: -3deg; } 50% { rotate: 3deg; } }
+.paisley { position: absolute; bottom: 26px; width: clamp(64px, 10vw, 130px); opacity: .32; pointer-events: none; }
+.paisley.pl { left: clamp(10px, 4vw, 70px); }
+.paisley.pr { right: clamp(10px, 4vw, 70px); transform: scaleX(-1); }
+.arch .kalash { position: absolute; top: -50px; left: 50%; translate: -50% 0; width: 76px; filter: drop-shadow(0 4px 8px rgba(0,0,0,.35)); }
+.arch .lotus { position: absolute; bottom: -24px; left: 50%; translate: -50% 0; width: 112px; filter: drop-shadow(0 4px 8px rgba(0,0,0,.35)); }
 @keyframes spin { to { rotate: 360deg; } }
 .toran { /* marigold garland with mango leaves */
   position: absolute; top: 0; left: 0; right: 0; height: 70px; z-index: 2;
@@ -310,6 +321,8 @@ small { color: var(--muted); font-size: .8em; }
   .row, .choice { grid-template-columns: 1fr; }
   .countdown div { min-width: 0; flex: 1; }
   .arch { padding: 60px 18px 36px; }
+  .lantern:nth-child(3) { display: none; }
+  .lanterns { top: 50px; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
