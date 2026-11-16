@@ -1,12 +1,13 @@
 #!/bin/sh
-# Builds sri-shubh-vivah/index.html (the 18-Jan-only invitation) from index.html.
-# Same page, marked data-invite="day", with asset paths pointing one folder up.
-# Run this after every change to index.html, before committing.
+# Builds the 18-Jan-only invitation into the sibling folder ../sri-shubh-vivah, which is its own
+# git repo published at https://shubhavee.github.io/sri-shubh-vivah/ (kept separate on purpose so
+# it can't be reached by trimming the main invitation's link).
+# Same page as index.html, marked data-invite="day". Run after every change, then commit & push both repos.
 cd "$(dirname "$0")/.." || exit 1
-mkdir -p sri-shubh-vivah
-sed -e 's|<html lang="en">|<html lang="en" data-invite="day">|' \
-    -e 's|href="styles.css|href="../styles.css|' \
-    -e 's|src="config.js|src="../config.js|' \
-    -e 's|src="script.js|src="../script.js|' \
-    -e 's|content="assets/|content="../assets/|' \
-    index.html > sri-shubh-vivah/index.html
+OUT="../sri-shubh-vivah"
+mkdir -p "$OUT/.github"
+sed -e 's|<html lang="en">|<html lang="en" data-invite="day">|' index.html > "$OUT/index.html"
+cp styles.css script.js config.js "$OUT/"
+cp .github/CODEOWNERS "$OUT/.github/CODEOWNERS"
+[ -d assets ] && cp -R assets "$OUT/"
+exit 0

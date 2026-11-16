@@ -25,7 +25,7 @@ window.WEDDING = {
 
   // Two invitations from the same site:
   //   "full" — main link, guests with a hotel stay (17–18 Jan, check-out 19 Jan)
-  //   "day"  — /sri-shubh-vivah/ link, guests invited on 18 Jan only
+  //   "day"  — shubhavee.github.io/sri-shubh-vivah/ (separate repo, see tools/build-day-invite.sh), 18 Jan only
   invites: {
     full: { label: "17–18 Jan (with stay)", displayDate: "17 – 19 January 2027" },
     day: { label: "18 Jan only", displayDate: "18 January 2027" },
