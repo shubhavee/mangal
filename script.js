@@ -1,7 +1,7 @@
 (() => {
   const W = window.WEDDING;
-  const SCRIPT_URL = document.currentScript.src; // asset paths resolve from here, so /shubh-vivah/ works too
-  // Which invitation this page is: shubh-vivah/index.html sets <html data-invite="day">.
+  const SCRIPT_URL = document.currentScript.src; // asset paths resolve from here, so /sri-shubh-vivah/ works too
+  // Which invitation this page is: sri-shubh-vivah/index.html sets <html data-invite="day">.
   const INVITE = document.documentElement.dataset.invite === "day" ? "day" : "full";
   const invite = W.invites[INVITE];
   W.displayDate = invite.displayDate;
