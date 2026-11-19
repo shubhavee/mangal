@@ -43,7 +43,7 @@ Both are free, fast (CDN) and HTTPS. A custom domain (e.g. `srishtiwedsshubham.i
 - If someone RSVPs again with the same phone number, their row is **updated**, not duplicated.
 
 ## Travel follow-ups (₹0, from Divya's WhatsApp)
-Guests can add their arrival and departure (date, time, flight/train/road, number) in the RSVP form, or later by
+Guests can add their arrival and departure (date, time, and flight/train/road) in the RSVP form, or later by
 submitting again with the same number. Share the Sheet with Divya (**Share → add her email as Editor**). For the rest:
 1. In the Sheet, choose **💍 Wedding → Build travel follow-up links**. (Reload the Sheet once if the menu isn't showing.)
 2. The **Follow-ups** tab lists every Yes guest whose **Arrival** is still empty, each with a **Message ➜** link.

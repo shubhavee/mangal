@@ -11,8 +11,8 @@
 // Guests on the 18-Jan-only invitation never pick 17 Jan, so theirs is always "No".
 const DAY_KEYS = ["17 Jan", "18 Jan"];
 // Travel details (all optional on the form) — for Divya's pickups and drops.
-const TRAVEL = [["Arrival", "arrivalDate"], ["Arrival time", "arrivalTime"], ["Arrival by", "arrivalBy"], ["Arrival no.", "arrivalNo"],
-  ["Departure", "departureDate"], ["Departure time", "departureTime"], ["Departure by", "departureBy"], ["Departure no.", "departureNo"]];
+const TRAVEL = [["Arrival", "arrivalDate"], ["Arrival time", "arrivalTime"], ["Arrival by", "arrivalBy"],
+  ["Departure", "departureDate"], ["Departure time", "departureTime"], ["Departure by", "departureBy"]];
 const RSVP_HEADERS = ["Updated", "Name", "Phone", "Invited by", "Invited for", "Attending", "Guests", "Guest 2", "Guest 3", "Guest 4",
   ...DAY_KEYS, "From", ...TRAVEL.map((t) => t[0]), "Message"];
 
@@ -57,7 +57,7 @@ function saveRsvp(d) {
 const FOLLOW_UP_TEXT = (name) =>
   `Hi ${name}! 🙏 This is Divya, the wedding planner for Srishti & Shubham's wedding in Bengaluru 🎉\n\n` +
   `To arrange your pickup and drop, could you please reply here with your arrival and departure ` +
-  `date, time and flight/train number (or a screenshot of your ticket)?\n\n` +
+  `date and time (or a screenshot of your ticket)?\n\n` +
   `Thank you! ❤️`;
 
 function onOpen() {
@@ -115,7 +115,7 @@ function findRow(sh, phone) {
 }
 
 // Bump this whenever RSVP_HEADERS or the formatting below changes; the sheet is re-laid-out once.
-const LAYOUT_VERSION = "6";
+const LAYOUT_VERSION = "7";
 
 // Header row as plain text (so "17 Jan" isn't read as a date), Yes = green / No = red colouring.
 function ensureLayout(sh) {
