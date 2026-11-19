@@ -10,7 +10,12 @@
 // One Yes/No column per RSVP day; must match the "key" of each day in the website's config.js.
 // Guests on the 18-Jan-only invitation never pick 17 Jan, so theirs is always "No".
 const DAY_KEYS = ["17 Jan", "18 Jan"];
-const RSVP_HEADERS = ["Updated", "Name", "Phone", "Invited for", "Attending", "Guests", ...DAY_KEYS, "From", "Message", "Ticket received?"];
+// Up to 4 people per RSVP (config.js → rsvp.maxGuests); each can upload a ticket and an Aadhaar card.
+const PEOPLE = ["Main guest", "Guest 2", "Guest 3", "Guest 4"];
+const FILE_HEADERS = PEOPLE.flatMap((p) => [`Ticket (${p})`, `Aadhaar (${p})`]);
+const RSVP_HEADERS = ["Updated", "Name", "Phone", "Invited by", "Invited for", "Attending", "Guests", "Guest 2", "Guest 3", "Guest 4",
+  ...DAY_KEYS, "From", "Message", ...FILE_HEADERS, "Ticket received?"];
+const DOCS_FOLDER = "Wedding RSVP documents";
 
 function doPost(e) {
   const lock = LockService.getScriptLock();
@@ -18,6 +23,7 @@ function doPost(e) {
   try {
     const d = JSON.parse(e.postData.contents);
     if (d.type === "rsvp") saveRsvp(d);
+    else if (d.type === "file") saveFile(d);
     return json({ ok: true });
   } catch (err) {
     return json({ ok: false, error: String(err) });
@@ -33,8 +39,11 @@ function doGet() {
 function saveRsvp(d) {
   const sh = tab("RSVPs", RSVP_HEADERS);
   ensureLayout(sh);
-  const row = [new Date(), d.name, d.phone ? "'" + d.phone : "", d.invite || "", d.attending, d.guests || "", ...DAY_KEYS.map((k) => ((d.days || []).includes(k) ? "Yes" : "No")), d.from || "", d.message || ""];
-  // Same phone number again = guest changed their answer → update their row (keeps "Ticket received?").
+  const row = [new Date(), d.name, d.phone ? "'" + d.phone : "", d.side || "", d.invite || "", d.attending, d.guests || "",
+    d.guest2 || "", d.guest3 || "", d.guest4 || "",
+    ...DAY_KEYS.map((k) => ((d.days || []).includes(k) ? "Yes" : "No")), d.from || "", d.message || ""];
+  // Same phone number again = guest changed their answer → update their row
+  // (only the answer columns; uploaded documents and "Ticket received?" are kept).
   const r = findRow(sh, d.phone);
   const rowNum = r || sh.getLastRow() + 1;
   sh.getRange(rowNum, 1, 1, row.length).setValues([row]);
@@ -45,11 +54,30 @@ function saveRsvp(d) {
   if (!r) sh.getRange(rowNum, RSVP_HEADERS.length).insertCheckboxes();
 }
 
+/** One uploaded document (sent after its RSVP): saved to Drive, linked in that guest's row. */
+function saveFile(d) {
+  if (!FILE_HEADERS.includes(d.column)) throw new Error("unknown column");
+  const sh = tab("RSVPs", RSVP_HEADERS);
+  const r = findRow(sh, d.phone);
+  if (!r) throw new Error("no RSVP for this number");
+  const ext = (d.fileName || "").match(/\.\w+$/)?.[0] || "";
+  const blob = Utilities.newBlob(Utilities.base64Decode(d.fileData), d.fileType || "application/octet-stream", `${d.name} - ${d.column}${ext}`);
+  const url = folder().createFile(blob).getUrl();
+  sh.getRange(r, RSVP_HEADERS.indexOf(d.column) + 1).setFormula(`=HYPERLINK("${url}","Open")`);
+  if (d.column.startsWith("Ticket")) sh.getRange(r, RSVP_HEADERS.length).setValue(true);
+}
+
+function folder() {
+  const it = DriveApp.getFoldersByName(DOCS_FOLDER);
+  return it.hasNext() ? it.next() : DriveApp.createFolder(DOCS_FOLDER);
+}
+
 /* ---------- Ticket follow-ups (sent from Divya's WhatsApp, one tap each) ---------- */
 
 const FOLLOW_UP_TEXT = (name) =>
-  `Hi ${name}! 🙏 This is Divya, the wedding planner for Srishti & Shubham's wedding in Bengaluru (17–19 Jan) 🎉\n\n` +
-  `To arrange your airport/station pickup, could you please reply here with your travel ticket (PDF or screenshot)?\n\n` +
+  `Hi ${name}! 🙏 This is Divya, the wedding planner for Srishti & Shubham's wedding in Bengaluru 🎉\n\n` +
+  `To arrange your airport/station pickup, could you please reply here with your travel ticket (PDF or screenshot)? ` +
+  `If you're staying with us at the hotel, please also share an Aadhaar card for each guest.\n\n` +
   `Thank you! ❤️`;
 
 function onOpen() {
@@ -107,7 +135,7 @@ function findRow(sh, phone) {
 }
 
 // Bump this whenever RSVP_HEADERS or the formatting below changes; the sheet is re-laid-out once.
-const LAYOUT_VERSION = "4";
+const LAYOUT_VERSION = "5";
 
 // Header row as plain text (so "17 Jan" isn't read as a date), Yes = green / No = red colouring.
 function ensureLayout(sh) {
