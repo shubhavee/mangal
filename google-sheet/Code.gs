@@ -40,7 +40,8 @@ function saveRsvp(d) {
   const row = [new Date(), d.name, d.phone ? "'" + d.phone : "", d.side || "", d.invite || "", d.attending, d.guests || "",
     d.guest2 || "", d.guest3 || "", d.guest4 || "",
     ...DAY_KEYS.map((k) => ((d.days || []).includes(k) ? "Yes" : "No")), d.from || "",
-    ...TRAVEL.map((t) => (d[t[1]] ? "'" + d[t[1]] : "")), d.message || ""]; // ' keeps "17 Jan" / "2:30 PM" as typed
+    // ' keeps "17 Jan" / "2:30 PM" as typed. Invitations that don't ask about travel (18 Jan only) get "N/A".
+    ...TRAVEL.map((t) => (d.travelAsked === false ? "N/A" : d[t[1]] ? "'" + d[t[1]] : "")), d.message || ""];
   // Same phone number again = guest changed their answer (or added travel later) → update their row.
   const r = findRow(sh, d.phone);
   const rowNum = r || sh.getLastRow() + 1;
