@@ -4,18 +4,17 @@
  * (Execute as: Me, Who has access: Anyone). Copy the URL into config.js → rsvp.sheetEndpoint.
  *
  * The "RSVPs" tab is created automatically. File → Download → Microsoft Excel (.xlsx) any time.
- * Ticket follow-ups: menu 💍 Wedding → Build ticket follow-up links (see README.md).
+ * Travel follow-ups: menu 💍 Wedding → Build travel follow-up links (see README.md).
  */
 
 // One Yes/No column per RSVP day; must match the "key" of each day in the website's config.js.
 // Guests on the 18-Jan-only invitation never pick 17 Jan, so theirs is always "No".
 const DAY_KEYS = ["17 Jan", "18 Jan"];
-// Up to 4 people per RSVP (config.js → rsvp.maxGuests); each can upload a ticket and an Aadhaar card.
-const PEOPLE = ["Main guest", "Guest 2", "Guest 3", "Guest 4"];
-const FILE_HEADERS = PEOPLE.flatMap((p) => [`Ticket (${p})`, `Aadhaar (${p})`]);
+// Travel details (all optional on the form) — for Divya's pickups and drops.
+const TRAVEL = [["Arrival", "arrivalDate"], ["Arrival time", "arrivalTime"], ["Arrival by", "arrivalBy"], ["Arrival no.", "arrivalNo"],
+  ["Departure", "departureDate"], ["Departure time", "departureTime"], ["Departure by", "departureBy"], ["Departure no.", "departureNo"]];
 const RSVP_HEADERS = ["Updated", "Name", "Phone", "Invited by", "Invited for", "Attending", "Guests", "Guest 2", "Guest 3", "Guest 4",
-  ...DAY_KEYS, "From", "Message", ...FILE_HEADERS, "Ticket received?"];
-const DOCS_FOLDER = "Wedding RSVP documents";
+  ...DAY_KEYS, "From", ...TRAVEL.map((t) => t[0]), "Message"];
 
 function doPost(e) {
   const lock = LockService.getScriptLock();
@@ -23,7 +22,6 @@ function doPost(e) {
   try {
     const d = JSON.parse(e.postData.contents);
     if (d.type === "rsvp") saveRsvp(d);
-    else if (d.type === "file") saveFile(d);
     return json({ ok: true });
   } catch (err) {
     return json({ ok: false, error: String(err) });
@@ -41,9 +39,9 @@ function saveRsvp(d) {
   ensureLayout(sh);
   const row = [new Date(), d.name, d.phone ? "'" + d.phone : "", d.side || "", d.invite || "", d.attending, d.guests || "",
     d.guest2 || "", d.guest3 || "", d.guest4 || "",
-    ...DAY_KEYS.map((k) => ((d.days || []).includes(k) ? "Yes" : "No")), d.from || "", d.message || ""];
-  // Same phone number again = guest changed their answer → update their row
-  // (only the answer columns; uploaded documents and "Ticket received?" are kept).
+    ...DAY_KEYS.map((k) => ((d.days || []).includes(k) ? "Yes" : "No")), d.from || "",
+    ...TRAVEL.map((t) => (d[t[1]] ? "'" + d[t[1]] : "")), d.message || ""]; // ' keeps "17 Jan" / "2:30 PM" as typed
+  // Same phone number again = guest changed their answer (or added travel later) → update their row.
   const r = findRow(sh, d.phone);
   const rowNum = r || sh.getLastRow() + 1;
   sh.getRange(rowNum, 1, 1, row.length).setValues([row]);
@@ -51,46 +49,27 @@ function saveRsvp(d) {
   // Day columns are Yes/No dropdowns (harder to flip by accident than a tick box).
   const yesNo = SpreadsheetApp.newDataValidation().requireValueInList(["Yes", "No"], true).setAllowInvalid(false).build();
   sh.getRange(rowNum, RSVP_HEADERS.indexOf(DAY_KEYS[0]) + 1, 1, DAY_KEYS.length).setDataValidation(yesNo);
-  if (!r) sh.getRange(rowNum, RSVP_HEADERS.length).insertCheckboxes();
 }
 
-/** One uploaded document (sent after its RSVP): saved to Drive, linked in that guest's row. */
-function saveFile(d) {
-  if (!FILE_HEADERS.includes(d.column)) throw new Error("unknown column");
-  const sh = tab("RSVPs", RSVP_HEADERS);
-  const r = findRow(sh, d.phone);
-  if (!r) throw new Error("no RSVP for this number");
-  const ext = (d.fileName || "").match(/\.\w+$/)?.[0] || "";
-  const blob = Utilities.newBlob(Utilities.base64Decode(d.fileData), d.fileType || "application/octet-stream", `${d.name} - ${d.column}${ext}`);
-  const url = folder().createFile(blob).getUrl();
-  sh.getRange(r, RSVP_HEADERS.indexOf(d.column) + 1).setFormula(`=HYPERLINK("${url}","Open")`);
-  if (d.column.startsWith("Ticket")) sh.getRange(r, RSVP_HEADERS.length).setValue(true);
-}
-
-function folder() {
-  const it = DriveApp.getFoldersByName(DOCS_FOLDER);
-  return it.hasNext() ? it.next() : DriveApp.createFolder(DOCS_FOLDER);
-}
-
-/* ---------- Ticket follow-ups (sent from Divya's WhatsApp, one tap each) ---------- */
+/* ---------- Travel follow-ups (sent from Divya's WhatsApp, one tap each) ---------- */
 
 const FOLLOW_UP_TEXT = (name) =>
   `Hi ${name}! 🙏 This is Divya, the wedding planner for Srishti & Shubham's wedding in Bengaluru 🎉\n\n` +
-  `To arrange your airport/station pickup, could you please reply here with your travel ticket (PDF or screenshot)? ` +
-  `If you're staying with us at the hotel, please also share an Aadhaar card for each guest.\n\n` +
+  `To arrange your pickup and drop, could you please reply here with your arrival and departure ` +
+  `date, time and flight/train number (or a screenshot of your ticket)?\n\n` +
   `Thank you! ❤️`;
 
 function onOpen() {
   SpreadsheetApp.getUi().createMenu("💍 Wedding")
-    .addItem("Build ticket follow-up links", "buildFollowUps")
+    .addItem("Build travel follow-up links", "buildFollowUps")
     .addToUi();
 }
 
 /**
- * Creates/refreshes the "Follow-ups" tab: every Yes guest whose "Ticket received?" box isn't ticked,
+ * Creates/refreshes the "Follow-ups" tab: every Yes guest whose Arrival is still empty,
  * with a WhatsApp link that opens a chat with them and the message ready to send.
  * Guests without a valid number (e.g. typed wrongly) are listed with a note to fix it on the RSVPs tab.
- * Guests reply with their ticket in that same chat; tick "Ticket received?" on the RSVPs tab when it arrives.
+ * When a guest replies, fill in their Arrival / Departure columns on the RSVPs tab.
  */
 function buildFollowUps() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -99,7 +78,7 @@ function buildFollowUps() {
   const sh = tab("Follow-ups", ["Name", "Phone", "Guests", "Tap to message on WhatsApp", "Sent? (tick)"]);
   const col = (h) => RSVP_HEADERS.indexOf(h);
   const rows = tab("RSVPs", RSVP_HEADERS).getDataRange().getValues().slice(1)
-    .filter((r) => r[col("Attending")] === "Yes" && r[col("Ticket received?")] !== true)
+    .filter((r) => r[col("Attending")] === "Yes" && !String(r[col("Arrival")]).trim())
     .map((r) => {
       const phone = String(r[col("Phone")]).replace(/\D/g, "").slice(-10);
       const first = String(r[col("Name")]).trim().split(" ")[0];
@@ -111,7 +90,7 @@ function buildFollowUps() {
     sh.getRange(2, 1, rows.length, 5).setValues(rows);
     sh.getRange(2, 5, rows.length, 1).insertCheckboxes();
   }
-  SpreadsheetApp.getUi().alert(`${rows.length} guests still need to send their tickets.`);
+  SpreadsheetApp.getUi().alert(`${rows.length} guests still need to share their travel details.`);
 }
 
 function tab(name, headers) {
@@ -135,7 +114,7 @@ function findRow(sh, phone) {
 }
 
 // Bump this whenever RSVP_HEADERS or the formatting below changes; the sheet is re-laid-out once.
-const LAYOUT_VERSION = "5";
+const LAYOUT_VERSION = "6";
 
 // Header row as plain text (so "17 Jan" isn't read as a date), Yes = green / No = red colouring.
 function ensureLayout(sh) {

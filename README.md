@@ -42,13 +42,14 @@ Both are free, fast (CDN) and HTTPS. A custom domain (e.g. `srishtiwedsshubham.i
   Fill their numbers in `config.js` → `rsvp.sides`. Until then, RSVPs go to `rsvp.fallbackNumber`.
 - If someone RSVPs again with the same phone number, their row is **updated**, not duplicated.
 
-## Ticket follow-ups (₹0, from Divya's WhatsApp)
-Share the Sheet with Divya (**Share → add her email as Editor**). When it's time to collect tickets:
-1. In the Sheet, choose **💍 Wedding → Build ticket follow-up links**. (Reload the Sheet once if the menu isn't showing.)
-2. The **Follow-ups** tab lists every Yes guest whose **Ticket received?** box isn't ticked yet, each with a **Message ➜** link.
+## Travel follow-ups (₹0, from Divya's WhatsApp)
+Guests can add their arrival and departure (date, time, flight/train/road, number) in the RSVP form, or later by
+submitting again with the same number. Share the Sheet with Divya (**Share → add her email as Editor**). For the rest:
+1. In the Sheet, choose **💍 Wedding → Build travel follow-up links**. (Reload the Sheet once if the menu isn't showing.)
+2. The **Follow-ups** tab lists every Yes guest whose **Arrival** is still empty, each with a **Message ➜** link.
 3. Divya taps a link on her phone. WhatsApp opens the guest's chat with a polite message already written, and she hits Send.
-4. Guests reply in that same chat with their ticket. Divya ticks **Ticket received?** on the RSVPs tab.
-5. Run the menu again a few days later. Only guests who still haven't sent their ticket will show up.
+4. When the guest replies, Divya fills in their Arrival / Departure columns on the RSVPs tab.
+5. Run the menu again a few days later. Only guests still missing travel details will show up.
 
 ## Music
 Add `assets/music.mp3` (see `assets/README.md`). Commercial Bollywood songs are copyrighted. For a private family invite
