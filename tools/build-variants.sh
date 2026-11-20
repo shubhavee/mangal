@@ -11,7 +11,8 @@ cd "$(dirname "$0")/.." || exit 1
 build() { # folder side invite
   OUT="../$1"
   mkdir -p "$OUT/.github"
-  sed -e "s|<html lang=\"en\" data-side=\"groom\" data-invite=\"full\">|<html lang=\"en\" data-side=\"$2\" data-invite=\"$3\">|" index.html > "$OUT/index.html"
+  SWAP=""; [ "$2" = bride ] && SWAP="s|Mumbai ❤ Delhi|Delhi ❤ Mumbai|" # link preview: host's city first
+  sed -e "s|<html lang=\"en\" data-side=\"groom\" data-invite=\"full\">|<html lang=\"en\" data-side=\"$2\" data-invite=\"$3\">|" -e "$SWAP" index.html > "$OUT/index.html"
   cp styles.css script.js config.js "$OUT/"
   cp .github/CODEOWNERS "$OUT/.github/CODEOWNERS"
   [ -d assets ] && cp -R assets "$OUT/"
